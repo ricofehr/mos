@@ -1,0 +1,16 @@
+- hosts: oscontroller
+  become: yes
+  tasks:
+    - name: Glance image
+      shell: >
+        echo "get qcow2 image";
+        echo "add image to glance";
+    - name: Neutron infra
+      shell: >
+        echo "network config";
+        echo "subnet config";
+        echo "router config";
+    - name: Quota setting
+      shell: >
+        echo "neutron quota";
+        echo "nova quota";

@@ -1,0 +1,63 @@
+#!/bin/bash -e
+
+#MAIN_ETH=eno1
+#sudo ip addr add 172.29.236.21 dev $MAIN_ETH
+
+# Clean older bootstrap
+vagrant destroy -f
+rm -rf /tmp/openstack-ansible
+rm -rf /etc/openstack-deploy
+
+# Launch vagrant vms
+vagrant up --provider=virtualbox
+
+# Execute ansible prerequisites for openstack
+sleep 5
+pushd ansible_pre >/dev/null
+ansible-playbook -i inventory playbook.yml
+popd >/dev/null
+
+# Deploy openstack-ansible project
+pushd /tmp >/dev/null
+git clone https://git.openstack.org/openstack/openstack-ansible
+pushd openstack-ansible >/dev/null
+git checkout -b 16.0.4
+
+# Bootstrap the project
+sudo ./scripts/./bootstrap-ansible.sh >/tmp/logbootstrap 2>&1
+sudo rsync -av etc/openstack_deploy /etc/
+
+# Generate default secrets credentials
+pushd scripts >/dev/null
+sudo python pw-token-gen.py --file /etc/openstack_deploy/user_secrets.yml
+popd >/dev/null
+
+# Back to starting folder
+popd >/dev/null
+popd >/dev/null
+
+# Override settings yaml files
+[[ -f assets/openstack_user_config.yml ]] || cp -f assets/openstack_user_config.yml.dist assets/openstack_user_config.yml
+[[ -f assets/user_secrets.yml ]] || cp -f assets/user_secrets.yml.dist assets/user_secrets.yml
+[[ -f assets/user_variables.yml ]] || cp -f assets/user_variables.yml.dist assets/user_variables.yml
+
+[[ -f assets/openstack_user_config.yml ]] && sudo cp assets/openstack_user_config.yml /etc/openstack_deploy/
+[[ -f assets/user_secrets.yml ]] && sudo cp assets/user_secrets.yml /etc/openstack_deploy/
+[[ -f assets/user_variables.yml ]] && sudo cp assets/user_variables.yml /etc/openstack_deploy/
+
+pushd /etc/openstack_deploy >/dev/null
+[[ -f openstack_user_config.yml ]] || sudo mv openstack_user_config.yml.test.example openstack_user_config.yml
+[[ -f user_variables.yml ]] || sudo cp user_variables.yml.test.example user_variables.yml
+popd >/dev/null
+
+# Execute openstack installation
+pushd /tmp/openstack-ansible/playbooks >/dev/null
+openstack-ansible setup-hosts.yml
+openstack-ansible setup-infrastructure.yml
+openstack-ansible setup-openstack.yml
+popd >/dev/null
+
+# Execute postinstall stuffs for openstack: import a glance image, network and subnets config
+pushd ansible_post >/dev/null
+ansible-playbook -i inventory playbook.yml
+popd >/dev/null

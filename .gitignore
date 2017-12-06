@@ -1,0 +1,5 @@
+.vagrant
+tmp
+playbook.retry
+
+assets/*.yml
