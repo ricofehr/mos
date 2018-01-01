@@ -1,10 +1,26 @@
 - hosts: oscontroller
   become: yes
   tasks:
-    - name: Glance image
-      shell: >
-        echo "get qcow2 image";
-        echo "add image to glance";
+    - name: Init utility container name
+      shell: ls /var/lib/lxc/ | grep utility | tr -d "\n"
+      register: utility_container
+    - name: Get qcow2 image from nd.io
+      get_url:
+        url: http://imgs.nextdeploy.io/os/osvm-xenial.img
+        dest: /var/lib/lxc/{{ utility_container.output }}/rootfs/tmp/osvm-xenial.img
+        mode: 0755
+    - name: Upload Glance image
+      shell: |
+        lxc-attach -n {{ utility_container.output }} --
+        source /root/openrc &&
+        glance image-create
+        --name xenial
+        --architectur amd64
+        --os-version 16.10
+        --disk-format qcow2
+        --container-format bare
+        --progress
+        --file osvm-xenial.img
     - name: Neutron infra
       shell: >
         echo "network config";
@@ -12,5 +28,24 @@
         echo "router config";
     - name: Quota setting
       shell: >
+        lxc-attach -n {{ utility_container.output }} --
+        source /root/openrc &&
+        nova secgroup-add-rule default tcp 22 22 0.0.0.0/0;
+        nova secgroup-add-rule default tcp 80 80 0.0.0.0/0;
+        nova secgroup-add-rule default tcp 139 139 0.0.0.0/0;
+        nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0;
+        nova quota-class-update --instances 217 default;
+        nova quota-class-update --key-pairs 1700 default;
+        nova quota-class-update --floating-ips 217 default;
+        nova quota-class-update --cores 416 default;
+        nova quota-class-update --ram 122880 default;
+        nova quota-class-update --metadata-items 1280 default;
+        nova quota-class-update --server-groups 217 default;
+        nova quota-class-update --server-group-members 217 default;
+        cinder quota-update --gigabytes 4000 default;
+        cinder quota-update --volumes 217 default;
+        cinder quota-update --snapshots 217 default;
+        neutron quota-update --port 217 --tenant-id "$(openstack --os-username neutron --os-password osneutron --os-tenant-name services --os-auth-url http://controller-m:35357/v2.0 project show -f value tenant0 -c id | tr -d "\n")"';
+        neutron quota-update --floatingip 217 --tenant-id "$(openstack --os-username neutron --os-password osneutron --os-tenant-name services --os-auth-url http://controller-m:35357/v2.0 project show -f value tenant0 -c id | tr -d "\n")"',
         echo "neutron quota";
         echo "nova quota";
