@@ -1,13 +1,20 @@
 - hosts: all
   become: yes
+
+  vars_files:
+    - vars.yml
+
   tasks:
-    - shell: >
+    - name: Prerequisites
+      shell: >
         apt-get update -y --force-yes;
         apt-get dist-upgrade -y --force-yes;
         apt-get install -y --force-yes bridge-utils debootstrap ifenslave ifenslave-2.6 lsof lvm2 ntp ntpdate openssh-server sudo tcpdump vlan;
         echo 'bonding' >> /etc/modules;
         echo '8021q' >> /etc/modules;
         service ntp restart;
+      environment:
+        DEBIAN_FRONTEND: noninteractive
 
     - name: Set authorized key took from file
       authorized_key:
@@ -16,11 +23,16 @@
         key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
   pre_tasks:
     - name: Local prerequisites
-      local_action: shell sudo apt-get install -y --force-yes aptitude build-essential git ntp ntpdate openssh-server python-dev sudo
-    - local_action: shell ip a | grep vboxnet2.10 || sudo vconfig add vboxnet2 10
-    - local_action: shell ip link set up vboxnet2.10
-    - local_action: shell ip a | grep 172.29.236.41 || sudo ip addr add 172.29.236.41 dev vboxnet2.10
-    - local_action: shell route -n | grep 172.29.236.0 || sudo route add -net 172.29.236.0/22 dev vboxnet2.10
+      local_action: shell DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes aptitude git ntp ntpdate openssh-server python-dev build-essential
+      run_once: true
+    - local_action: shell ip a | grep {{ vlan_dev }}.10 || sudo vconfig add {{ vlan_dev }} 10
+      run_once: true
+    - local_action: shell ip link set up {{ vlan_dev }}.10
+      run_once: true
+    - local_action: shell ip a | grep 172.29.236.41 || sudo ip addr add 172.29.236.41 dev {{ vlan_dev }}.10
+      run_once: true
+    - local_action: shell route -n | grep 172.29.236.0 || sudo route add -net 172.29.236.0/22 dev {{ vlan_dev }}.10
+      run_once: true
 
 - hosts: oscontroller
   become: yes

@@ -12,7 +12,12 @@ rm -rf /etc/openstack-deploy
 vagrant up --provider=virtualbox
 
 # Execute ansible prerequisites for openstack
-sleep 5
+sleep 25
+
+# Find right interface
+vboxdev="$(netstat -ie | grep -B1 '192.168.80.1' | head -n1 | sed "s; .*;;" | tr -d "\n")"
+echo "vlan_dev: ${vboxdev}" > ansible_pre/vars.yml
+
 pushd ansible_pre >/dev/null
 ansible-playbook -i inventory playbook.yml
 popd >/dev/null
@@ -52,9 +57,9 @@ popd >/dev/null
 
 # Execute openstack installation
 pushd /tmp/openstack-ansible/playbooks >/dev/null
-openstack-ansible setup-hosts.yml
-openstack-ansible setup-infrastructure.yml
-openstack-ansible setup-openstack.yml
+sudo openstack-ansible setup-hosts.yml
+sudo openstack-ansible setup-infrastructure.yml
+sudo openstack-ansible setup-openstack.yml
 popd >/dev/null
 
 # Execute postinstall stuffs for openstack: import a glance image, network and subnets config
