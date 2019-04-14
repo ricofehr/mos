@@ -1,0 +1,3 @@
+[submodule "ansible/roles/base"]
+	path = ansible/roles/base
+	url = https://github.com/ricofehr/ansible-role-base

@@ -1,0 +1,84 @@
+---
+
+- name: Network installer config
+  shell: |
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes aptitude git ntp ntpdate openssh-server python-dev build-essential libpq-dev python-dev libpython-dev libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev libffi-dev python-pip
+    vconfig add eth1 10
+    ip link set up eth1.10
+    ip addr add 172.29.236.41 dev eth1.10
+    route add -net 172.29.236.0/22 dev eth1.10
+  become: yes
+
+- name: Copy local vagrant private key file to osinstaller
+  copy:
+    src: ~/.vagrant.d/insecure_private_key
+    dest: ~/.ssh/id_rsa
+    mode: 0600
+  become: yes
+
+- name: Generate local vagrant public key file
+  shell: cp /home/vagrant/.ssh/authorized_keys ~/.ssh/id_rsa.pub && chmod 0644 ~/.ssh/id_rsa.pub
+  become: yes
+
+- name: clone git repo
+  shell: |
+    git clone https://git.openstack.org/openstack/openstack-ansible
+    cd openstack-ansible
+    git checkout -b 18.1.1
+    mkdir -p assets
+  become: yes
+
+- name: bootstrap the project
+  shell: |
+    ./scripts/./bootstrap-ansible.sh >/tmp/logbootstrap 2>&1
+    rsync -av etc/openstack_deploy /etc/
+  args:
+    chdir: openstack-ansible
+  become: yes
+
+- name: Default secrets
+  shell: |
+    pip install pyaml
+    python pw-token-gen.py --file /etc/openstack_deploy/user_secrets.yml
+  args:
+    chdir: openstack-ansible/scripts
+  become: yes
+
+- name: sync assets folder
+  synchronize:
+    src: assets/
+    dest: assets/
+  become: yes
+
+- name: Override settings
+  shell: |
+    [[ -f openstack_user_config.yml ]] || cp -f openstack_user_config.yml.dist openstack_user_config.yml
+    [[ -f user_secrets.yml ]] || cp -f user_secrets.yml.dist user_secrets.yml
+    [[ -f user_variables.yml ]] || cp -f user_variables.yml.dist user_variables.yml
+    [[ -f openstack_user_config.yml ]] && cp openstack_user_config.yml /etc/openstack_deploy/
+    [[ -f user_secrets.yml ]] && cp user_secrets.yml /etc/openstack_deploy/
+    [[ -f user_variables.yml ]] && cp user_variables.yml /etc/openstack_deploy/
+    [[ -d env.d ]] && rsync -av env.d/ /etc/openstack_deploy/env.d/
+    sed -i "s/nova_virt_type:.*/nova_virt_type: {{ libvirt_driver }}/" /etc/openstack_deploy/user_variables.yml
+  args:
+    chdir: assets
+    executable: /bin/bash
+  become: yes
+
+- name: Override settings, step 2
+  shell: |
+    [[ -f openstack_user_config.yml ]] || mv openstack_user_config.yml.test.example openstack_user_config.yml
+    [[ -f user_variables.yml ]] || cp user_variables.yml.test.example user_variables.yml
+  args:
+    chdir: /etc/openstack_deploy
+    executable: /bin/bash
+  become: yes
+
+- name: Execute openstack-ansible
+  shell: |
+    openstack-ansible --ssh-extra-args "-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-hosts.yml >/tmp/loghosts 2>&1
+    openstack-ansible --ssh-extra-args "-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-infrastructure.yml >/tmp/loginfra 2>&1
+    openstack-ansible --ssh-extra-args "-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-openstack.yml >/tmp/logos 2>&1
+  args:
+    chdir: openstack-ansible/playbooks
+  become: yes

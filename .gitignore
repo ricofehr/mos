@@ -1,5 +1,5 @@
 .vagrant
 tmp
 playbook.retry
-ansible_pre/vars.yml
-assets/*.yml
+ansible/vars.yml
+ansible/assets/*.yml

@@ -1,51 +1,139 @@
+- hosts:
+    - oscompute1
+    - oscompute2
+  become: yes
+  tasks:
+    - name: Fix br-vlan agent issue
+      shell: |
+        sed -i "s/^physical_interface_mappings =.*$/physical_interface_mappings = vlan:br-vlan,flat:eth2/" /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+        systemctl restart neutron-linuxbridge-agent
+      args:
+        executable: /bin/bash
+
 - hosts: oscontroller
   become: yes
+  vars:
+    k8s_deploy: 0
   tasks:
     - name: Init utility container name
       shell: ls /var/lib/lxc/ | grep utility | tr -d "\n"
       register: utility_container
-    - name: Get qcow2 image from nd.io
-      get_url:
-        url: http://imgs.nextdeploy.io/os/osvm-xenial.img
-        dest: /var/lib/lxc/{{ utility_container.output }}/rootfs/tmp/osvm-xenial.img
-        mode: 0755
-    - name: Upload Glance image
-      shell: |
-        lxc-attach -n {{ utility_container.output }} --
-        source /root/openrc &&
-        glance image-create
-        --name xenial
-        --architectur amd64
-        --os-version 16.10
-        --disk-format qcow2
-        --container-format bare
-        --progress
-        --file osvm-xenial.img
+
     - name: Neutron infra
       shell: >
-        echo "network config";
-        echo "subnet config";
-        echo "router config";
+        lxc-attach -n {{ utility_container.stdout }} --
+        /bin/bash -c
+        "source /root/openrc &&
+        openstack project create tenant0 &&
+        openstack user create --project tenant0 --password tenant0 tenant0 &&
+        openstack role add --user tenant0 --project tenant0 _member_ &&
+        openstack network create --share --project service --external --provider-network-type flat --provider-physical-network flat public &&
+        openstack network create --share --project tenant0 --provider-network-type vxlan private &&
+        openstack subnet create --project service --subnet-range 192.168.90.0/24 --no-dhcp --gateway 192.168.90.1 --dns-nameserver 8.8.8.8 --network public --ip-version 4 --allocation-pool start=192.168.90.100,end=192.168.90.254 192.168.90.0/24 &&
+        openstack subnet create --project tenant0 --subnet-range 10.0.171.0/24 --dhcp --dns-nameserver 8.8.8.8 --network private --ip-version 4 10.0.171.0/24 &&
+        openstack router create --no-ha --project tenant0 tenant0 &&
+        openstack router add subnet tenant0 10.0.171.0/24 &&
+        openstack router set --external-gateway public tenant0"
+      args:
+        executable: /bin/bash
+
+    - name: Flavor setting
+      shell: >
+        lxc-attach -n {{ utility_container.stdout }} --
+        /bin/bash -c
+        "source /root/openrc &&
+        openstack flavor create --ram 1024 --disk 20 --vcpus 1 small &&
+        openstack flavor create --ram 4096 --disk 40 --vcpus 2 medium &&
+        openstack flavor create --ram 8192 --disk 80 --vcpus 4 large &&
+        openstack flavor create --ram 16384 --disk 120 --vcpus 6 xlarge"
+      args:
+        executable: /bin/bash
+
+    - name: Security group rules setting
+      shell: >
+        lxc-attach -n {{ utility_container.stdout }} --
+        /bin/bash -c
+        "source /root/openrc &&
+        eval \$(openstack project show tenant0 -c id -f shell) &&
+        idsecurity=\$(openstack security group list -f csv | grep \$id | sed 's;,.*$;;' | tr -d '\"') &&
+        openstack security group rule create --project tenant0 --protocol tcp --dst-port 22 --prefix 0.0.0.0/0 \$idsecurity &&
+        openstack security group rule create --project tenant0 --protocol tcp --dst-port 80 --prefix 0.0.0.0/0 \$idsecurity &&
+        openstack security group rule create --project tenant0 --protocol tcp --dst-port 443 --prefix 0.0.0.0/0 \$idsecurity &&
+        openstack security group rule create --project tenant0 --protocol icmp --prefix 0.0.0.0/0 \$idsecurity"
+      args:
+        executable: /bin/bash
+
     - name: Quota setting
       shell: >
-        lxc-attach -n {{ utility_container.output }} --
-        source /root/openrc &&
-        nova secgroup-add-rule default tcp 22 22 0.0.0.0/0;
-        nova secgroup-add-rule default tcp 80 80 0.0.0.0/0;
-        nova secgroup-add-rule default tcp 139 139 0.0.0.0/0;
-        nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0;
-        nova quota-class-update --instances 217 default;
-        nova quota-class-update --key-pairs 1700 default;
-        nova quota-class-update --floating-ips 217 default;
-        nova quota-class-update --cores 416 default;
-        nova quota-class-update --ram 122880 default;
-        nova quota-class-update --metadata-items 1280 default;
-        nova quota-class-update --server-groups 217 default;
-        nova quota-class-update --server-group-members 217 default;
-        cinder quota-update --gigabytes 4000 default;
-        cinder quota-update --volumes 217 default;
-        cinder quota-update --snapshots 217 default;
-        neutron quota-update --port 217 --tenant-id "$(openstack --os-username neutron --os-password osneutron --os-tenant-name services --os-auth-url http://controller-m:35357/v2.0 project show -f value tenant0 -c id | tr -d "\n")"';
-        neutron quota-update --floatingip 217 --tenant-id "$(openstack --os-username neutron --os-password osneutron --os-tenant-name services --os-auth-url http://controller-m:35357/v2.0 project show -f value tenant0 -c id | tr -d "\n")"',
-        echo "neutron quota";
-        echo "nova quota";
+        lxc-attach -n {{ utility_container.stdout }} --
+        /bin/bash -c
+        "source /root/openrc &&
+        openstack quota set --class --instances 100 --key-pairs 120 --cores 200 --ram 122880 --server-groups 120 --server-group-members 120 --gigabytes 4000 --volumes 120 --snapshots 120 default &&
+        openstack quota set --ports 100 --floating-ips 100 tenant0 &&
+        openstack quota set --ports 100 --floating-ips 100 service"
+      args:
+        executable: /bin/bash
+
+    - name: Get xenial qcow2 image from ubuntu-cloud
+      get_url:
+        url: https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
+        dest: /var/lib/lxc/{{ utility_container.stdout }}/rootfs/tmp/osvm-xenial.img
+        mode: 0755
+
+    - name: Get bionic qcow2 image from ubuntu-cloud
+      get_url:
+        url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+        dest: /var/lib/lxc/{{ utility_container.stdout }}/rootfs/tmp/osvm-bionic.img
+        mode: 0755
+
+    - name: Upload Glance images
+      shell: >
+        lxc-attach -n {{ utility_container.stdout }} --
+        /bin/bash -c
+        "source /root/openrc &&
+        openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-xenial.img xenial &&
+        openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-bionic.img bionic"
+      args:
+        executable: /bin/bash
+
+    - name: K8S security group
+      shell: >
+        lxc-attach -n {{ utility_container.stdout }} --
+        /bin/bash -c
+        "source /root/openrc &&
+        openstack security group create --project tenant0 k8s &&
+        openstack security group rule create --project tenant0 --protocol tcp --dst-port 22 --prefix 0.0.0.0/0 k8s &&
+        openstack security group rule create --project tenant0 --protocol tcp --dst-port 80 --prefix 0.0.0.0/0 k8s &&
+        openstack security group rule create --project tenant0 --protocol tcp --dst-port 443 --prefix 0.0.0.0/0 k8s &&
+        openstack security group rule create --project tenant0 --protocol tcp --dst-port 8001 --prefix 0.0.0.0/0 k8s &&
+        openstack security group rule create --project tenant0 --protocol icmp --prefix 0.0.0.0/0 k8s &&
+        openstack security group rule create --project tenant0 --protocol tcp --remote-group k8s k8s"
+      when: k8s_deploy == "1"
+
+- hosts: osinstaller
+  become: yes
+  vars:
+    k8s_deploy: 0
+  tasks:
+    - name: Download terraform
+      get_url:
+        url: https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip
+        dest: /tmp/terraform.zip
+      when: k8s_deploy == "1"
+
+    - name: Install terraform
+      shell: |
+        cd /tmp
+        unzip terraform.zip
+        mv terraform /usr/bin/
+        chmod +x /usr/bin/terraform
+      args:
+        executable: /bin/bash
+      when: k8s_deploy == "1"
+
+    - name: Deploy k8s
+      shell: |
+        cd /home/vagrant && git clone https://github.com/ricofehr/k8s
+        cd k8s && git submodule update --init >/dev/null 2>&1
+        ./deployos >/tmp/logk8s 2>&1
+      when: k8s_deploy == "1"

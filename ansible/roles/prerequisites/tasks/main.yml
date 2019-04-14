@@ -1,0 +1,18 @@
+---
+
+- name: Prerequisites
+  shell: |
+    DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get update -yq --allow-unauthenticated
+    yes | DEBIAN_FRONTEND=noninteractive apt-get /usr/bin/apt-get dist-upgrade -yq --allow-unauthenticated
+    DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get install -yq --allow-unauthenticated bridge-utils debootstrap ifenslave ifenslave-2.6 lsof lvm2 ntp ntpdate openssh-server sudo tcpdump vlan
+    echo 'bonding' >> /etc/modules
+    echo '8021q' >> /etc/modules
+    service ntp restart
+  become: yes
+- name: Set authorized key took from file
+  shell: mkdir -p ~/.ssh && cp /home/vagrant/.ssh/authorized_keys ~/.ssh/authorized_keys
+  become: yes
+  # authorized_key:
+  #   user: root
+  #   state: present
+  #   key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

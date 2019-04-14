@@ -1,0 +1,46 @@
+- hosts:
+    - osinstaller
+    - oscompute1
+    - oscompute2
+    - osstorage
+  serial: 1
+  strategy: linear
+  roles:
+    - role: systemd_dns
+
+- hosts: all 
+  serial: 1
+  strategy: linear
+  roles:
+    - role: base
+    - role: prerequisites
+
+- hosts: oscontroller
+  serial: 1
+  strategy: linear
+  roles:
+    - controller
+
+- hosts: oscompute1
+  serial: 1
+  strategy: linear
+  roles:
+    - compute1
+
+- hosts: oscompute2
+  serial: 1
+  strategy: linear
+  roles:
+    - compute2
+
+- hosts: osstorage
+  serial: 1
+  strategy: linear
+  roles:
+    - cinder
+
+- hosts: osinstaller
+  serial: 1
+  strategy: linear
+  roles:
+    - installer

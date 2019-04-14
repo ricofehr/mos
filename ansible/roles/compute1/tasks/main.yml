@@ -1,0 +1,95 @@
+---
+
+- name: create libvirt disk
+  shell: |
+    disk="/dev/vda"
+    [[ -e /dev/sdb ]] && disk="/dev/sdb"
+    yes Yes | parted -a optimal $disk mklabel msdos
+    parted -a optimal $disk mkpart primary ext4 0% 100%
+    mkfs.ext4 "${disk}1"
+    mkdir -p /var/lib/nova
+    mount "${disk}1" /var/lib/nova
+    echo `blkid "${disk}1" | awk '{print$2}' | sed -e 's/"//g'` /var/lib/nova   ext4   noatime,nobarrier   0   0 >> /etc/fstab
+  become: yes
+
+- name: Interface oscompute1
+  blockinfile:
+    path: /etc/network/interfaces
+    block: |
+      # Container/Host management VLAN interface
+      auto eth1.10
+      iface eth1.10 inet static
+          vlan-raw-device eth1
+
+      # OpenStack Networking VXLAN (tunnel/overlay) VLAN interface
+      auto eth2.30
+      iface eth2.30 inet manual
+          vlan-raw-device eth2
+
+      # OpenStack Networking VLAN interface for storage
+      auto eth1.20
+      iface eth1.20 inet manual
+          vlan-raw-device eth1
+
+      # Container/Host management bridge
+      auto br-mgmt
+      iface br-mgmt inet static
+          bridge_stp off
+          bridge_waitport 0
+          bridge_fd 0
+          bridge_ports eth1.10
+          address 172.29.236.111
+          netmask 255.255.252.0
+          #gateway 172.29.236.1
+          dns-nameservers 8.8.8.8 8.8.4.4
+          up sed -i "s/#DNS=/DNS=8.8.8.8/;s/#FallbackDNS=/FallbackDNS=8.8.4.4/" /etc/systemd/resolved.conf
+          #post-up route del default dev eth0
+          post-up service systemd-resolved restart
+          # post-up route add -net 172.29.236.0/22 gw 172.29.236.1 dev br-mgmt
+
+      # OpenStack Networking VXLAN (tunnel/overlay) bridge
+      #
+      # Only the COMPUTE and NETWORK nodes must have an IP address
+      # on this bridge. When used by infrastructure nodes, the
+      # IP addresses are assigned to containers which use this
+      # bridge.
+      #
+      # compute1 VXLAN (tunnel/overlay) bridge config
+      auto br-vxlan
+      iface br-vxlan inet static
+          bridge_stp off
+          bridge_waitport 0
+          bridge_fd 0
+          bridge_ports eth2.30
+          address 172.29.248.5
+          netmask 255.255.252.0
+
+      # OpenStack Networking VLAN bridge
+      auto br-vlan
+      iface br-vlan inet static
+          bridge_stp off
+          bridge_waitport 0
+          bridge_fd 0
+          bridge_ports eth2
+          address 192.168.85.75
+          netmask 255.255.255.128
+          pre-up ip a del 192.168.85.75/25 dev eth2
+          post-up ethtool -K eth2 gro off
+
+      # compute1 Storage bridge
+      auto br-storage
+      iface br-storage inet static
+          bridge_stp off
+          bridge_waitport 0
+          bridge_fd 0
+          bridge_ports eth1.20
+          address 172.29.244.112
+          netmask 255.255.252.0
+  become: yes
+
+- name: Reboot
+  shell: /sbin/shutdown -r +1
+  async: 0
+  poll: 0
+  ignore_errors: true
+  become: yes
