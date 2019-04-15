@@ -3,7 +3,7 @@
 Openstack installation with Vagrant : 1 controller/neutron, 1 cinder, 2 computes, with use of openstack-ansible project.
 Optionnaly, deploy into it a k8s on 3 vms : 1 master and 2 nodes.
 
-## Prerequisites
+## Requirements
 
 Ensure you have enough system resources
 - 6 CPU Cores / 12Ht
@@ -52,14 +52,6 @@ Once installation is done, you need some additional setup steps into your local 
 ```
 route add -net 172.29.236.0/22 gw 192.168.80.70
 route add -net 192.168.90.0/24 dev virbr3
-```
-
-And with libvirt provider, you need disable some iptables rules (replace virbr2 with your 192.168.80.1 network interface and virbr3 with your 192.168.85.1 network interface)
-```
-iptables -D FORWARD -o virbr2 -j REJECT --reject-with icmp-port-unreachable
-iptables -D FORWARD -i virbr2 -j REJECT --reject-with icmp-port-unreachable
-iptables -D FORWARD -o virbr3 -j REJECT --reject-with icmp-port-unreachable
-iptables -D FORWARD -i virbr3 -j REJECT --reject-with icmp-port-unreachable
 ```
 
 After that, you can reach the openstack dashboard
