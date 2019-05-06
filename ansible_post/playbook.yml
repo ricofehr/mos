@@ -44,6 +44,7 @@
         "source /root/openrc &&
         openstack flavor create --ram 1024 --disk 20 --vcpus 1 small &&
         openstack flavor create --ram 4096 --disk 40 --vcpus 2 medium &&
+        openstack flavor create --ram 6144 --disk 60 --vcpus 3 xmedium &&
         openstack flavor create --ram 8192 --disk 80 --vcpus 4 large &&
         openstack flavor create --ram 16384 --disk 120 --vcpus 6 xlarge"
       args:
@@ -86,13 +87,21 @@
         dest: /var/lib/lxc/{{ utility_container.stdout }}/rootfs/tmp/osvm-bionic.img
         mode: 0755
 
+    - name: Get CentOS7 qcow2 image from centos-cloud
+      get_url:
+        url: http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+        dest: /var/lib/lxc/{{ utility_container.stdout }}/rootfs/tmp/osvm-centos7.img
+        mode: 0755
+
     - name: Upload Glance images
       shell: >
         lxc-attach -n {{ utility_container.stdout }} --
         /bin/bash -c
         "source /root/openrc &&
         openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-xenial.img xenial &&
-        openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-bionic.img bionic"
+        openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-bionic.img bionic &&
+        openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-centos7.img centos7 &&
+        rm -f /tmp/osvm-xenial.img /tmp/osvm-bionic.img /tmp/osvm-centos7.img"
       args:
         executable: /bin/bash
 
@@ -108,6 +117,24 @@
         openstack security group rule create --project tenant0 --protocol tcp --dst-port 8001 --prefix 0.0.0.0/0 k8s &&
         openstack security group rule create --project tenant0 --protocol icmp --prefix 0.0.0.0/0 k8s &&
         openstack security group rule create --project tenant0 --protocol tcp --remote-group k8s k8s"
+      when: k8s_deploy == "1"
+
+    - name: Get public network id
+      shell: >
+        lxc-attach -n {{ utility_container.stdout }} --
+        /bin/bash -c
+        "source /root/openrc &&
+        openstack network show public -c id -f value | tr -d '\n'"
+      register: public_network_id
+      when: k8s_deploy == "1"
+
+    - name: Get private subnetwork id
+      shell: >
+        lxc-attach -n {{ utility_container.stdout }} --
+        /bin/bash -c
+        "source /root/openrc &&
+        openstack subnet show 10.0.171.0/24 -c id -f value | tr -d '\n'"
+      register: private_subnetwork_id
       when: k8s_deploy == "1"
 
 - hosts: osinstaller
@@ -135,5 +162,5 @@
       shell: |
         cd /home/vagrant && git clone https://github.com/ricofehr/k8s
         cd k8s && git submodule update --init >/dev/null 2>&1
-        ./deployos >/tmp/logk8s 2>&1
+        ./deployos -snet {{ hostvars['oscontroller']['private_subnetwork_id'].stdout }} -fip {{ hostvars['oscontroller']['public_network_id'].stdout }} >/tmp/logk8s 2>&1
       when: k8s_deploy == "1"
