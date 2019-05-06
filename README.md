@@ -63,8 +63,9 @@ You can deploy a k8s during setup with '-k' parameter on ./up command
 ```
 ./up -k
 ```
-
 Kubernetes deployment will launch 3 vms : 1 master and 2 nodes, and use vagrant public ssh key as openstack keypair.
+
 This deployment uses this k8s install repository: https://github.com/ricofehr/k8s
+
 Once k8s deployed, you can reach the dashboard with this url (change K8SMASTERIP with the floatingip assigned by openstack on k8s-master1 vm)
 http://K8SMASTERIP:8001/api/v1/namespaces/kube-system/services/https:dashboard-kubernetes-dashboard:https/proxy/
