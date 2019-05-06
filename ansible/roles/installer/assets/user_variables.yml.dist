@@ -3,10 +3,13 @@
 # which may need to be set for a production environment.
 
 ## OpenStack public endpoint protocol
-openstack_service_publicuri_proto: https
+openstack_service_publicuri_proto: http
+haproxy_ssl: false
 
 neutron_plugin_base:
    - router
    - neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2
    # - qos
 nova_virt_type: kvm
+
+#haproxy_ssl_self_signed_subject: "/C=FR/ST=IDF/L=Paris/O=IT/CN=172.29.236.100"
