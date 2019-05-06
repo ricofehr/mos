@@ -28,11 +28,18 @@ Vagrant.configure("2") do |config|
       virthost.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
       virthost.memory = 8192
       virthost.cpus = 2
-    end
+
+      unless File.exist?("/datas/os/disk_lxc.vdi")
+        virthost.customize [ "createhd", "--filename", "/datas/os/disk_lxc.vdi", "--size", "153600" ]
+      end
+      virthost.customize [ "storageattach", :id, "--storagectl", "SATA Controller", "--port", 3, "--device", 0, "--type", "hdd", "--medium", "/datas/os/disk_lxc.vdi" ]
+     end
 
     uosc.vm.provider :libvirt do |virthost|
       virthost.memory = 8192
       virthost.cpus = 2
+      virthost.volume_cache = "writeback"
+      virthost.storage :file, size: '150G', type: 'qcow2', path: 'disk_lxc.img'
     end
 
     uosc.vm.network :private_network, ip: "192.168.80.70", netmask: "255.255.255.128"
