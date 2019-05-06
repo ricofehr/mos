@@ -7,6 +7,7 @@
     ip link set up eth1.10
     ip addr add 172.29.236.41 dev eth1.10
     route add -net 172.29.236.0/22 dev eth1.10
+    route add -net 192.168.90.0/24 dev eth2
   become: yes
 
 - name: Copy local vagrant private key file to osinstaller
