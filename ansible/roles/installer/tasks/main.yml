@@ -1,5 +1,11 @@
 ---
 
+- name: Swap off
+  shell: |
+    swapoff -a
+    sed -i 's/^.*swap.*$/#/g' /etc/fstab
+  become: yes
+
 - name: Network installer config
   shell: |
     DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes aptitude git ntp ntpdate openssh-server python-dev build-essential libpq-dev python-dev libpython-dev libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev libffi-dev python-pip

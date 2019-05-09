@@ -1,5 +1,11 @@
 ---
 
+- name: Swap off
+  shell: |
+    swapoff -a
+    sed -i 's/^.*swap.*$/#/g' /etc/fstab
+  become: yes
+
 - name: create lxc disk
   shell: |
     disk="/dev/vda"
@@ -10,6 +16,12 @@
     mkdir -p /var/lib/lxc
     mount "${disk}1" /var/lib/lxc
     echo `blkid "${disk}1" | awk '{print$2}' | sed -e 's/"//g'` /var/lib/lxc   ext4   noatime,nobarrier   0   0 >> /etc/fstab
+  become: yes
+
+- name: Override openssl.cnf (add altsubjectname line)
+  template:
+    src: templates/openssl.cnf.j2
+    dest: /etc/ssl/openssl.cnf
   become: yes
 
 - name: Ip forwarding

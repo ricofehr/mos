@@ -1,5 +1,11 @@
 ---
 
+- name: Swap off
+  shell: |
+    swapoff -a
+    sed -i 's/^.*swap.*$/#/g' /etc/fstab
+  become: yes
+
 - name: create cinder lvm
   shell: |
     disk="vda"
