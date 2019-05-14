@@ -67,5 +67,15 @@ Kubernetes deployment will launch 3 vms : 1 master and 2 nodes, and use vagrant 
 
 This deployment uses this k8s install repository: https://github.com/ricofehr/k8s
 
-Once k8s deployed, you can reach the dashboard with this url (change K8SMASTERIP with the floatingip assigned by openstack on k8s-master1 vm)
-http://K8SMASTERIP:8001/api/v1/namespaces/kube-system/services/https:dashboard-kubernetes-dashboard:https/proxy/
+Once k8s deployed, get the "loadbalancer k8s" floating ip from openstack dashboard and add this line to your /etc/hosts file
+```
+LOADBALANCERIP gogs.k8s.local sonar.k8s.local keycloak.k8s.local registry.k8s.local concourse.k8s.local dashboard.k8s.local
+```
+
+After that you can reach the following urls
+- https://dashboard.k8s.local/ => k8s dashboard
+- https://gogs.k8s.local/ => gogs git repository
+- https://sonar.k8s.local/ => Quality code scan tool
+- https://registry.k8s.local/ => private docker registry
+- https://concourse.k8s.local/ => concourse CI/CD tool
+- https://keycloak.k8s.local/ (keycloak / keypass) => RedHat SSO tool
