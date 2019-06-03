@@ -7,6 +7,7 @@ haproxy_ssl: true
 horizon_enable_ssl: true
 haproxy_ssl_self_signed_regen: yes
 haproxy_ssl_self_signed_subject: "/C=FR/ST=IDFs/L=Paris/O=IT/CN={{ external_lb_vip_address }}"
+nova_resume_guests_state_on_host_boot: true
 
 neutron_plugin_base:
    - router
