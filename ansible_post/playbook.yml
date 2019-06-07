@@ -143,7 +143,6 @@
       when: k8s_deploy == "1"
 
 - hosts: osinstaller
-  become: yes
   vars:
     k8s_deploy: 0
   tasks:
@@ -161,6 +160,7 @@
         chmod +x /usr/bin/terraform
       args:
         executable: /bin/bash
+      become: yes
       when: k8s_deploy == "1"
 
     - name: Prepare openstack ssl cert
@@ -169,6 +169,24 @@
                  {{ hostvars['oscontroller']['haproxy_ssl_crt'].stdout }}
         dest: /home/vagrant/cloud.crt
       when: k8s_deploy == "1"
+
+    - name: Install recent ansible
+      shell: |
+        apt update
+        apt install -y software-properties-common
+        apt-add-repository --yes --update ppa:ansible/ansible
+        apt install -y ansible
+      become: yes
+
+    - name: generate rsa keys for current user
+      shell: |
+        mkdir -p /home/vagrant/.ssh
+        ssh-keygen -t rsa -N "" -f /home/vagrant/.ssh/id_rsa
+      when: k8s_deploy == "1"
+
+#    - name: generate rsa keys for current user (need ansible 2.8)
+#      openssh_keypair:
+#        force: True
 
     - name: Deploy k8s
       shell: |

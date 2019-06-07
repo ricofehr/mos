@@ -37,7 +37,7 @@
     mkdir -p assets
   become: yes
 
-- name: bootstrap the project
+- name: bootstrap the osa project
   shell: |
     ./scripts/./bootstrap-ansible.sh >/tmp/logbootstrap 2>&1
     rsync -av etc/openstack_deploy /etc/
