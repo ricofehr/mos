@@ -68,10 +68,10 @@ export ANSIBLE_NOCOWS=1
 
 # Deploy an openstack installation
 pushd ansible >/dev/null
-ansible-playbook --ssh-extra-args "-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "libvirt_driver=$LIBVIRTDRIVER"
+ansible-playbook --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "libvirt_driver=$LIBVIRTDRIVER"
 popd >/dev/null
 
 # Execute postinstall stuffs for openstack: import a glance image, network and subnets config
 pushd ansible_post >/dev/null
-ansible-playbook --ssh-extra-args "-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "k8s_deploy=$K8SDEPLOY"
+ansible-playbook --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "k8s_deploy=$K8SDEPLOY"
 popd >/dev/null
