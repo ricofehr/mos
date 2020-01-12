@@ -69,7 +69,7 @@ This deployment uses this k8s install repository: https://github.com/ricofehr/k8
 
 Once k8s deployed, get the "loadbalancer k8s" floating ip from openstack dashboard and add this line to your /etc/hosts file
 ```
-LOADBALANCERIP gogs.k8s.local sonar.k8s.local keycloak.k8s.local registry.k8s.local concourse.k8s.local dashboard.k8s.local
+LOADBALANCERIP gogs.k8s.local sonar.k8s.local keycloak.k8s.local registry.k8s.local concourse.k8s.local dashboard.k8s.local borgmon.k8s.local grafana.k8s.local
 ```
 
 After that you can reach the following urls
@@ -79,3 +79,7 @@ After that you can reach the following urls
 - https://registry.k8s.local/ => private docker registry
 - https://concourse.k8s.local/ => concourse CI/CD tool
 - https://keycloak.k8s.local/ (keycloak / keypass) => RedHat SSO tool
+- https://borgmon.k8s.local/ => prometheus alertmanager UI
+- https://grafana.k8s.local/ (admin / admin123) => grafana metrics dashboard
+
+
