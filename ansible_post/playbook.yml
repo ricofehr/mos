@@ -46,7 +46,7 @@
         openstack flavor create --ram 4096 --disk 40 --vcpus 2 medium &&
         openstack flavor create --ram 6144 --disk 60 --vcpus 3 xmedium &&
         openstack flavor create --ram 8192 --disk 80 --vcpus 4 large &&
-        openstack flavor create --ram 16384 --disk 120 --vcpus 6 xlarge"
+        openstack flavor create --ram 12288 --disk 120 --vcpus 4 xlarge"
       args:
         executable: /bin/bash
 
@@ -191,6 +191,7 @@
     - name: Deploy k8s
       shell: |
         cd /home/vagrant && git clone https://github.com/ricofehr/k8s
-        cd k8s && git reset --hard 614076bff20bc43074ac6 && git submodule update --init >/dev/null 2>&1
+        cd k8s && git reset --hard 2692b02c3f54d1378f3437 && git submodule update --init >/dev/null 2>&1
+        echo "./deployos -snet {{ hostvars['oscontroller']['private_subnetwork_id'].stdout }} -fip {{ hostvars['oscontroller']['public_network_id'].stdout }} -oscrt /home/vagrant/cloud.crt" > /tmp/cmdk8s
         ./deployos -snet {{ hostvars['oscontroller']['private_subnetwork_id'].stdout }} -fip {{ hostvars['oscontroller']['public_network_id'].stdout }} -oscrt /home/vagrant/cloud.crt >/tmp/logk8s 2>&1
       when: k8s_deploy == "1"

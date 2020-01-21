@@ -53,7 +53,7 @@ Vagrant.configure("2") do |config|
       virthost.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       virthost.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
       virthost.auto_nat_dns_proxy = false
-      virthost.memory = 36864
+      virthost.memory = 40960
       virthost.cpus = 6
 
       unless File.exist?("/datas/os/disk_nova1.vdi")
@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
     end
 
     uosnv.vm.provider :libvirt do |virthost|
-      virthost.memory = 36864
+      virthost.memory = 40960
       virthost.cpus = 6
       virthost.nested = true
       virthost.driver = 'kvm'
@@ -84,7 +84,7 @@ Vagrant.configure("2") do |config|
       virthost.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       virthost.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
       virthost.auto_nat_dns_proxy = false
-      virthost.memory = 36864
+      virthost.memory = 40960
       virthost.cpus = 6
 
       unless File.exist?("/datas/os/disk_nova2.vdi")
@@ -94,7 +94,7 @@ Vagrant.configure("2") do |config|
    end
 
    uosnv.vm.provider :libvirt do |virthost|
-     virthost.memory = 36864
+     virthost.memory = 40960
      virthost.cpus = 6
      virthost.nested = true
      virthost.driver = 'kvm'
