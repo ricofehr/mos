@@ -9,6 +9,7 @@
 - name: create cinder lvm
   shell: |
     disk="vda"
+    [[ -e /dev/vdb ]] && disk="vdb"
     [[ -e /dev/sdb ]] && disk="sdb"
     pvcreate /dev/${disk}
     vgcreate cinder-volumes /dev/${disk}

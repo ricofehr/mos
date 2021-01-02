@@ -9,6 +9,7 @@
 - name: create libvirt disk
   shell: |
     disk="/dev/vda"
+    [[ -e /dev/vdb ]] && disk="/dev/vdb"
     [[ -e /dev/sdb ]] && disk="/dev/sdb"
     yes Yes | parted -a optimal $disk mklabel msdos
     parted -a optimal $disk mkpart primary ext4 0% 100%
@@ -16,6 +17,8 @@
     mkdir -p /var/lib/nova
     mount "${disk}1" /var/lib/nova
     echo `blkid "${disk}1" | awk '{print$2}' | sed -e 's/"//g'` /var/lib/nova   ext4   noatime,nobarrier   0   0 >> /etc/fstab
+  args:
+    executable: /bin/bash
   become: yes
 
 - name: Interface oscompute1
