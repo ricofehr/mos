@@ -55,8 +55,8 @@ if [[ "$PROVIDER" = "libvirt" ]]; then
   LIBVIRTDRIVER="kvm"
 else
   LIBVIRTDRIVER="qemu"
-  sudo mkdir -p /datas/os
-  sudo chmod 777 /datas/os
+  sudo mkdir -p /usr/local/datas/os
+  sudo chmod 777 /usr/local/datas/os
 fi
 
 # Launch vagrant vms

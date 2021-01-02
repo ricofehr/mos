@@ -29,10 +29,11 @@ Vagrant.configure("2") do |config|
       virthost.memory = 8192
       virthost.cpus = 2
 
-      unless File.exist?("/datas/os/disk_lxc.vdi")
-        virthost.customize [ "createhd", "--filename", "/datas/os/disk_lxc.vdi", "--size", "153600" ]
+      unless File.exist?("/usr/local/datas/os/disk_lxc.vdi")
+        virthost.customize ["storagectl", :id, "--name", "SATA Controller", "--add", "sata"]
+        virthost.customize ["createhd", "--filename", "/usr/local/datas/os/disk_lxc.vdi", "--size", "153600"]
       end
-      virthost.customize [ "storageattach", :id, "--storagectl", "SATA Controller", "--port", 3, "--device", 0, "--type", "hdd", "--medium", "/datas/os/disk_lxc.vdi" ]
+      virthost.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 3, "--device", 0, "--type", "hdd", "--medium", "/usr/local/datas/os/disk_lxc.vdi", "--nonrotational", "on", "--discard", "on"]
      end
 
     uosc.vm.provider :libvirt do |virthost|
@@ -56,10 +57,12 @@ Vagrant.configure("2") do |config|
       virthost.memory = 40960
       virthost.cpus = 6
 
-      unless File.exist?("/datas/os/disk_nova1.vdi")
-        virthost.customize [ "createhd", "--filename", "/datas/os/disk_nova1.vdi", "--size", "409600" ]
+      unless File.exist?("/usr/local/datas/os/disk_nova1.vdi")
+        virthost.customize ["storagectl", :id, "--name", "SATA Controller", "--add", "sata"]
+        virthost.customize ["createhd", "--filename", "/usr/local/datas/os/disk_nova1.vdi", "--size", "409600"]
       end
-      virthost.customize [ "storageattach", :id, "--storagectl", "SATA Controller", "--port", 3, "--device", 0, "--type", "hdd", "--medium", "/datas/os/disk_nova1.vdi" ]
+      virthost.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 3, "--device", 0, "--type", "hdd", "--medium", "/usr/local/datas/os/disk_nova1.vdi", "--nonrotational", "on", "--discard", "on"]
+      virthost.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
     end
 
     uosnv.vm.provider :libvirt do |virthost|
@@ -87,10 +90,12 @@ Vagrant.configure("2") do |config|
       virthost.memory = 40960
       virthost.cpus = 6
 
-      unless File.exist?("/datas/os/disk_nova2.vdi")
-        virthost.customize [ "createhd", "--filename", "/datas/os/disk_nova2.vdi", "--size", "409600" ]
+      unless File.exist?("/usr/local/datas/os/disk_nova2.vdi")
+        virthost.customize ["storagectl", :id, "--name", "SATA Controller", "--add", "sata"]
+        virthost.customize ["createhd", "--filename", "/usr/local/datas/os/disk_nova2.vdi", "--size", "409600"]
       end
-      virthost.customize [ "storageattach", :id, "--storagectl", "SATA Controller", "--port", 3, "--device", 0, "--type", "hdd", "--medium", "/datas/os/disk_nova2.vdi" ]
+      virthost.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 3, "--device", 0, "--type", "hdd", "--medium", "/usr/local/datas/os/disk_nova2.vdi", "--nonrotational", "on", "--discard", "on"]
+      virthost.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
    end
 
    uosnv.vm.provider :libvirt do |virthost|
@@ -118,10 +123,11 @@ Vagrant.configure("2") do |config|
        virthost.memory = 4096
        virthost.cpus = 2
 
-       unless File.exist?("/datas/os/disk_cinder.vdi")
-         virthost.customize [ "createhd", "--filename", "/datas/os/disk_cinder.vdi", "--size", "409600" ]
+       unless File.exist?("/usr/local/datas/os/disk_cinder.vdi")
+         virthost.customize ["storagectl", :id, "--name", "SATA Controller", "--add", "sata"]
+         virthost.customize ["createhd", "--filename", "/usr/local/datas/os/disk_cinder.vdi", "--size", "409600"]
        end
-       virthost.customize [ "storageattach", :id, "--storagectl", "SATA Controller", "--port", 3, "--device", 0, "--type", "hdd", "--medium", "/datas/os/disk_cinder.vdi" ]
+       virthost.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 3, "--device", 0, "--type", "hdd", "--medium", "/usr/local/datas/os/disk_cinder.vdi", "--nonrotational", "on", "--discard", "on"]
     end
 
     uosst.vm.provider :libvirt do |virthost|
