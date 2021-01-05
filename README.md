@@ -48,10 +48,16 @@ Usage: ./up [options]
 
 ## PostInstall Instructions
 
-Once installation is done, you need some additional setup steps into your local workstation (replace virbr3 with your 192.168.85.1 network interface)
+Once installation is done, you need some additional setup steps into your local workstation
+- Linux (replace virbr3 with your 192.168.85.1 network interface)
 ```
-route add -net 172.29.236.0/22 gw 192.168.80.70
-route add -net 192.168.90.0/24 dev virbr3
+# route add -net 172.29.236.0/22 gw 192.168.80.70
+# route add -net 192.168.90.0/24 dev virbr3
+```
+- MacOs (replace vboxnet1 with your 192.168.85.1 network interface)
+```
+# route add -net 172.29.236.0/22 192.168.80.70
+# route add -net 192.168.90.0/24 -interface vboxnet1
 ```
 
 After that, you can reach the openstack dashboard

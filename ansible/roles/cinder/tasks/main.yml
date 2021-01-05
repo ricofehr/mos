@@ -9,11 +9,19 @@
 - name: create cinder lvm
   shell: |
     disk="vda"
-    [[ -e /dev/vdb ]] && disk="vdb"
-    [[ -e /dev/sdb ]] && disk="sdb"
+    if [[ -e /dev/vdb ]]; then
+      disk="vdb"
+    fi
+    if [[ -e /dev/sdb ]]; then
+      disk="sdb"
+    fi
+    if [[ -e /dev/nvme0 ]]; then
+      disk="nvme0n1"
+    fi
     pvcreate /dev/${disk}
     vgcreate cinder-volumes /dev/${disk}
     sed -i "s;# filter = .*/dev/cdrom.*$;filter = [ \"a/sda1/\", \"a/${disk}/\", \"r|.*/|\" ];" /etc/lvm/lvm.conf
+    sed -i "s/use_lvmetad = 0/use_lvmetad = 1/" /etc/lvm/lvm.conf
   args:
     executable: /bin/bash
   become: yes

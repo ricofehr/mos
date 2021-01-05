@@ -4,6 +4,7 @@ PROVIDER="virtualbox"
 LIBVIRTDRIVER=""
 K8SDEPLOY=0
 ISDESTROY=0
+LIBVIRTDRIVER="kvm"
 
 # Help function
 deployhelp() {
@@ -51,10 +52,7 @@ if ((ISDESTROY == 1)); then
 fi
 
 # Create vdi disk folder
-if [[ "$PROVIDER" = "libvirt" ]]; then
-  LIBVIRTDRIVER="kvm"
-else
-  LIBVIRTDRIVER="qemu"
+if [[ "$PROVIDER" = "virtualbox" ]]; then
   sudo mkdir -p /usr/local/datas/os
   sudo chmod 777 /usr/local/datas/os
 fi
@@ -66,12 +64,14 @@ sleep 10
 # Disable cowsay ansible output
 export ANSIBLE_NOCOWS=1
 
+mkdir -p tmp
+
 # Deploy an openstack installation
 pushd ansible >/dev/null
-ansible-playbook --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "libvirt_driver=$LIBVIRTDRIVER"
+ansible-playbook --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "libvirt_driver=$LIBVIRTDRIVER" 2>&1 | tee ../tmp/openstack-deploy.log
 popd >/dev/null
 
 # Execute postinstall stuffs for openstack: import a glance image, network and subnets config
 pushd ansible_post >/dev/null
-ansible-playbook --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "k8s_deploy=$K8SDEPLOY"
+ansible-playbook --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "k8s_deploy=$K8SDEPLOY" 2>&1 | tee ../tmp/openstack-config-k8s.log
 popd >/dev/null

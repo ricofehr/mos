@@ -29,12 +29,9 @@
 
 - name: clone git repo
   shell: |
-    git clone https://git.openstack.org/openstack/openstack-ansible
-    cd openstack-ansible
-    git fetch --all
-    git fetch --tags
-    git reset --hard 18.1.6
-    mkdir -p assets
+    git clone -b stable/stein https://git.openstack.org/openstack/openstack-ansible
+  args:
+    chdir: /opt
   become: yes
 
 - name: bootstrap the osa project
@@ -42,15 +39,16 @@
     ./scripts/./bootstrap-ansible.sh >/tmp/logbootstrap 2>&1
     rsync -av etc/openstack_deploy /etc/
   args:
-    chdir: openstack-ansible
+    chdir: /opt/openstack-ansible
   become: yes
 
 - name: Default secrets
   shell: |
     pip install pyaml
     python pw-token-gen.py --file /etc/openstack_deploy/user_secrets.yml
+    sed -i "s/keystone_auth_admin_password: .*$/keystone_auth_admin_password: toor/" /etc/openstack_deploy/user_secrets.yml
   args:
-    chdir: openstack-ansible/scripts
+    chdir: /opt/openstack-ansible/scripts
   become: yes
 
 - name: sync assets folder
@@ -62,10 +60,8 @@
 - name: Override settings
   shell: |
     [[ -f openstack_user_config.yml ]] || cp -f openstack_user_config.yml.dist openstack_user_config.yml
-    [[ -f user_secrets.yml ]] || cp -f user_secrets.yml.dist user_secrets.yml
     [[ -f user_variables.yml ]] || cp -f user_variables.yml.dist user_variables.yml
     [[ -f openstack_user_config.yml ]] && cp openstack_user_config.yml /etc/openstack_deploy/
-    [[ -f user_secrets.yml ]] && cp user_secrets.yml /etc/openstack_deploy/
     [[ -f user_variables.yml ]] && cp user_variables.yml /etc/openstack_deploy/
     [[ -d env.d ]] && rsync -av env.d/ /etc/openstack_deploy/env.d/
     sed -i "s/nova_virt_type:.*/nova_virt_type: {{ libvirt_driver }}/" /etc/openstack_deploy/user_variables.yml
@@ -83,11 +79,45 @@
     executable: /bin/bash
   become: yes
 
-- name: Execute openstack-ansible
-  shell: |
-    openstack-ansible --ssh-extra-args "-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-hosts.yml >/tmp/loghosts 2>&1
-    openstack-ansible --ssh-extra-args "-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-infrastructure.yml >/tmp/loginfra 2>&1
-    openstack-ansible --ssh-extra-args "-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-openstack.yml >/tmp/logos 2>&1
-  args:
-    chdir: openstack-ansible/playbooks
+- name: "Ensure infra1 is resolved into hosts file"
+  lineinfile:
+    dest: /etc/hosts
+    line: "172.29.236.101 infra1"
+    state: present
+  with_items: "{{ ansible_play_hosts }}"
+  when: hostvars[inventory_hostname]['ansible_host'] is defined
   become: yes
+
+- name: Execute openstack-ansible setup-hosts
+  shell: |
+    openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-hosts.yml >/tmp/loghosts 2>&1
+  args:
+    chdir: /opt/openstack-ansible/playbooks
+  become: yes
+
+- name: Pause after setup hosts
+  pause:
+    minutes: 1
+
+- name: Execute openstack-ansible setup-infra
+  shell: |
+    openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-infrastructure.yml >/tmp/loginfra 2>&1
+  args:
+    chdir: /opt/openstack-ansible/playbooks
+  become: yes
+
+- name: Pause after setup infra
+  pause:
+    minutes: 1
+
+- name: Execute openstack-ansible setup-openstack
+  shell: |
+    openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-openstack.yml >/tmp/logos 2>&1
+  args:
+    executable: /bin/bash
+    chdir: /opt/openstack-ansible/playbooks
+  become: yes
+
+- name: Pause after setup openstack
+  pause:
+    minutes: 1
