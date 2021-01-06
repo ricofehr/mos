@@ -1,16 +1,14 @@
 # os-ansible-poc
 
 Openstack installation with Vagrant : 1 controller/neutron, 1 cinder, 2 computes, with use of openstack-ansible project.
-Optionnaly, deploy into it a k8s on 3 vms : 1 master and 2 nodes.
+Optionnaly, deploy into it a k8s on 6 vms : 1 master and 5 nodes.
 
 ## Requirements
 
 Ensure you have enough system resources
-- 6 CPU Cores / 12Ht
+- 6 CPU Cores
 - 90 Go RAM
-- 1To Disk
-
-You can make change in Vagrantfile if this doesnt fit with your system.
+- Between 200Go and 2To Disk
 
 For setup execution, you need following packages/softwares on your workstation
 - An hypervisor : virtualbox or kvm (recommanded) with libvirtd
@@ -18,7 +16,7 @@ For setup execution, you need following packages/softwares on your workstation
 
 ## Libvirt vs Virtualbox
 
-Default is virtualbox provider install because virtualbox is easier to use and is compliant with majority of OS. But virtualbox dont provide well nested virtualization.
+Default is virtualbox provider install because virtualbox is easier to use and is compliant with majority of OS. But virtualbox dont provide well nested virtualization and has some constraints about vlan traffic flows.
 
 If you are onto Linux, you should use libvirt provider instead, better performance and full nested virtualization
 - Install libvirtd daemon
@@ -69,23 +67,19 @@ You can deploy a k8s during setup with '-k' parameter on ./up command
 ```
 ./up -k
 ```
-Kubernetes deployment will launch 3 vms : 1 master and 2 nodes, and use vagrant public ssh key as openstack keypair.
+Kubernetes deployment will launch 6 vms : 1 master and 5 nodes, and use vagrant public ssh key as openstack keypair (!! not secure).
 
 This deployment uses this k8s install repository: https://github.com/ricofehr/k8s
 
 Once k8s deployed, get the "loadbalancer k8s" floating ip from openstack dashboard and add this line to your /etc/hosts file
 ```
-LOADBALANCERIP gogs.k8s.local sonar.k8s.local keycloak.k8s.local registry.k8s.local concourse.k8s.local dashboard.k8s.local borgmon.k8s.local grafana.k8s.local
+LOADBALANCERIP gitea.k8s.local sonar.k8s.local jenkinsx.k8s.local dashboard.k8s.local regi
+stry.k8s.local
 ```
 
-After that you can reach the following urls
+After that you can reach the following urls (other tools in next releases)
 - https://dashboard.k8s.local/ => k8s dashboard
-- https://gogs.k8s.local/ => gogs git repository
+- https://gitea.k8s.local/ => gitea git repository
 - https://sonar.k8s.local/ => Quality code scan tool
 - https://registry.k8s.local/ => private docker registry
-- https://concourse.k8s.local/ => concourse CI/CD tool
-- https://keycloak.k8s.local/ (keycloak / keypass) => RedHat SSO tool
-- https://borgmon.k8s.local/ => prometheus alertmanager UI
-- https://grafana.k8s.local/ (admin / admin123) => grafana metrics dashboard
-
-
+- https://jenkinsx.k8s.local/ => Jenkinsx CI/CD tool
