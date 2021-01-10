@@ -6,15 +6,52 @@
     sed -i 's/^.*swap.*$/#/g' /etc/fstab
   become: yes
 
-- name: Network installer config
-  shell: |
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes aptitude git ntp ntpdate openssh-server python-dev build-essential libpq-dev python-dev libpython-dev libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev libffi-dev python-pip
-    vconfig add eth1 10
-    ip link set up eth1.10
-    ip addr add 172.29.236.41 dev eth1.10
-    route add -net 172.29.236.0/22 dev eth1.10
-    route add -net 192.168.90.0/24 dev eth2
+- name: Interface osinstaller
+  blockinfile:
+    path: /etc/network/interfaces
+    block: |
+      # Container/Host management VLAN interface
+      auto eth1.10
+      iface eth1.10 inet manual
+          vlan-raw-device eth1
+
+      # OpenStack Networking VLAN bridge
+      auto br-vlan
+      iface br-vlan inet static
+          bridge_stp off
+          bridge_waitport 0
+          bridge_fd 0
+          bridge_ports eth2
+          address 192.168.85.20
+          netmask 255.255.255.128
+          pre-up ip a del 192.168.85.20/25 dev eth2
+          post-up ethtool -K eth2 gro off
+          post-up ip a add 192.168.90.2/24 dev br-vlan
+
+      # Container/Host management bridge
+      auto br-mgmt
+      iface br-mgmt inet static
+          bridge_stp off
+          bridge_waitport 0
+          bridge_fd 0
+          bridge_ports eth1.10
+          address 172.29.236.41
+          netmask 255.255.252.0
+          dns-nameservers 8.8.8.8 8.8.4.4
+          up sed -i "s/^.*DNS=.*$/DNS=8.8.8.8/;s/^.*FallbackDNS=.*$/FallbackDNS=8.8.4.4/" /etc/systemd/resolved.conf
+          post-up service systemd-resolved restart
   become: yes
+
+- name: Reboot
+  shell: /sbin/shutdown -r +1
+  async: 0
+  poll: 0
+  ignore_errors: true
+  become: yes
+
+- name: Ensure installer is up
+  pause:
+    minutes: 5
 
 - name: Copy local vagrant private key file to osinstaller
   copy:
@@ -27,7 +64,7 @@
   shell: cp /home/vagrant/.ssh/authorized_keys ~/.ssh/id_rsa.pub && chmod 0644 ~/.ssh/id_rsa.pub
   become: yes
 
-- name: clone git repo
+- name: clone openstack-ansible (stein release) repo
   shell: |
     git clone -b stable/stein https://git.openstack.org/openstack/openstack-ansible
   args:
@@ -42,13 +79,22 @@
     chdir: /opt/openstack-ansible
   become: yes
 
+- name: python-yaml library
+  apt:
+    name: python-yaml
+    state: present
+  become: yes
+
 - name: Default secrets
   shell: |
-    pip install pyaml
     python pw-token-gen.py --file /etc/openstack_deploy/user_secrets.yml
-    sed -i "s/keystone_auth_admin_password: .*$/keystone_auth_admin_password: toor/" /etc/openstack_deploy/user_secrets.yml
   args:
     chdir: /opt/openstack-ansible/scripts
+  become: yes
+
+- name: Override horizon admin password
+  shell: |
+    sed -i "s/keystone_auth_admin_password: .*$/keystone_auth_admin_password: toor/" /etc/openstack_deploy/user_secrets.yml
   become: yes
 
 - name: sync assets folder

@@ -13,7 +13,7 @@ Usage: $0 [options]
 -h           this is some help text.
 -d           destroy all previously openstack install
 -p xxxx      vagrant provider, default is virtualbox
--k           deploy k8s onto 3 vms (1 master and 2 nodes) after openstack install
+-k           deploy k8s onto 6 vms (1 master and 5 nodes) after openstack install ending
 EOF
 
 exit 1
@@ -53,6 +53,7 @@ fi
 
 # Create vdi disk folder
 if [[ "$PROVIDER" = "virtualbox" ]]; then
+  LIBVIRTDRIVER="qemu"
   sudo mkdir -p /usr/local/datas/os
   sudo chmod 777 /usr/local/datas/os
 fi

@@ -44,9 +44,9 @@
         "source /root/openrc &&
         openstack flavor create --ram 1024 --disk 20 --vcpus 1 small &&
         openstack flavor create --ram 4096 --disk 40 --vcpus 2 medium &&
-        openstack flavor create --ram 6144 --disk 60 --vcpus 3 xmedium &&
-        openstack flavor create --ram 8192 --disk 80 --vcpus 4 large &&
-        openstack flavor create --ram 12288 --disk 120 --vcpus 4 xlarge"
+        openstack flavor create --ram 4096 --disk 40 --vcpus 3 xmedium &&
+        openstack flavor create --ram 6144 --disk 60 --vcpus 3 large &&
+        openstack flavor create --ram 6144 --disk 80 --vcpus 4 xlarge"
       args:
         executable: /bin/bash
 
@@ -75,16 +75,16 @@
       args:
         executable: /bin/bash
 
-    - name: Get xenial qcow2 image from ubuntu-cloud
-      get_url:
-        url: https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
-        dest: /var/lib/lxc/{{ utility_container.stdout }}/rootfs/tmp/osvm-xenial.img
-        mode: 0755
-
     - name: Get bionic qcow2 image from ubuntu-cloud
       get_url:
         url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
         dest: /var/lib/lxc/{{ utility_container.stdout }}/rootfs/tmp/osvm-bionic.img
+        mode: 0755
+
+    - name: Get focal qcow2 image from ubuntu-cloud
+      get_url:
+        url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+        dest: /var/lib/lxc/{{ utility_container.stdout }}/rootfs/tmp/osvm-focal.img
         mode: 0755
 
     - name: Get CentOS7 qcow2 image from centos-cloud
@@ -98,8 +98,8 @@
         lxc-attach -n {{ utility_container.stdout }} --
         /bin/bash -c
         "source /root/openrc &&
-        openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-xenial.img xenial &&
         openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-bionic.img bionic &&
+        openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-focal.img focal &&
         openstack image create --project tenant0 --disk-format qcow2 --file /tmp/osvm-centos7.img centos7 &&
         rm -f /tmp/osvm-xenial.img /tmp/osvm-bionic.img /tmp/osvm-centos7.img"
       args:
@@ -148,7 +148,7 @@
   tasks:
     - name: Download terraform
       get_url:
-        url: https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip
+        url: https://releases.hashicorp.com/terraform/0.12.30/terraform_0.12.30_linux_amd64.zip
         dest: /tmp/terraform.zip
       when: k8s_deploy == "1"
 
@@ -170,15 +170,7 @@
         dest: /home/vagrant/cloud.crt
       when: k8s_deploy == "1"
 
-    - name: Install recent ansible
-      shell: |
-        apt update
-        apt install -y software-properties-common
-        apt-add-repository --yes --update ppa:ansible/ansible
-        apt install -y ansible
-      become: yes
-
-    - name: generate rsa keys for current user
+    - name: generate ssh rsa keys for current user
       shell: |
         mkdir -p /home/vagrant/.ssh
         ssh-keygen -t rsa -N "" -f /home/vagrant/.ssh/id_rsa
@@ -188,6 +180,6 @@
       shell: |
         cd /home/vagrant && git clone https://github.com/ricofehr/k8s
         cd k8s && git reset --hard v0.1 && git submodule update --init >/dev/null 2>&1
-        echo "./deployos -snet {{ hostvars['oscontroller']['private_subnetwork_id'].stdout }} -fip {{ hostvars['oscontroller']['public_network_id'].stdout }} -oscrt /home/vagrant/cloud.crt" > /tmp/cmdk8s
-        ./deployos -snet {{ hostvars['oscontroller']['private_subnetwork_id'].stdout }} -fip {{ hostvars['oscontroller']['public_network_id'].stdout }} -oscrt /home/vagrant/cloud.crt >/tmp/logk8s 2>&1
+        echo "./deployos -o bionic -snet {{ hostvars['oscontroller']['private_subnetwork_id'].stdout }} -fip {{ hostvars['oscontroller']['public_network_id'].stdout }} -oscrt /home/vagrant/cloud.crt" > /tmp/cmdk8s
+        ./deployos -o bionic -snet {{ hostvars['oscontroller']['private_subnetwork_id'].stdout }} -fip {{ hostvars['oscontroller']['public_network_id'].stdout }} -oscrt /home/vagrant/cloud.crt >/tmp/logk8s 2>&1
       when: k8s_deploy == "1"

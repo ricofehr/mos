@@ -45,37 +45,6 @@
     sed -i "s;#net.ipv4.ip_forward=1;net.ipv4.ip_forward=1;" /etc/sysctl.conf
   become: yes
 
-- name: Prepare haproxy install folder
-  file:
-    path: /opt/cache/files/v0.8.0
-    state: directory
-    owner: root
-    group: root
-    mode: 0775
-  become: yes
-
-- name: prepare ethtobr script
-  shell: touch /usr/local/bin/ethtobr.sh
-  become: yes
-
-- name: br-vlan script setting fix
-  blockinfile:
-    path: /usr/local/bin/ethtobr.sh
-    block: |
-      #!/bin/bash
-      ip a del 192.168.85.70/25 dev eth2
-      route del -net 192.168.85.0/25 dev eth2
-      route add -net 192.168.85.0/25 dev br-vlan
-      ip a add 192.168.90.1/24 dev br-vlan
-  become: yes
-
-- name: Ensure br-vlan and eth2 are well defined
-  cron:
-    name: fix-brvlan
-    user: root
-    job: /bin/bash /usr/local/bin/ethtobr.sh
-  become: yes
-
 - name: Interface oscontroller
   blockinfile:
     path: /etc/network/interfaces
@@ -105,7 +74,6 @@
           address 192.168.85.70
           netmask 255.255.255.128
           pre-up ip a del 192.168.85.70/25 dev eth2
-          #post-up ip a del 192.168.85.70/25 dev eth2
           post-up ethtool -K eth2 gro off
           post-up ip a add 192.168.90.1/24 dev br-vlan
           post-up iptables -t nat -A POSTROUTING -s 192.168.90.0/24 ! -d 192.168.90.0/24 -j MASQUERADE
@@ -121,13 +89,8 @@
           address 172.29.236.101
           netmask 255.255.252.0
           dns-nameservers 8.8.8.8 8.8.4.4
-          # gateway 172.29.236.1
           up sed -i "s/^.*DNS=.*$/DNS=8.8.8.8/;s/^.*FallbackDNS=.*$/FallbackDNS=8.8.4.4/" /etc/systemd/resolved.conf
           post-up ip addr add 172.29.236.1/22 dev br-mgmt
-          #post-up iptables -t nat -A POSTROUTING -o br-mgmt -j MASQUERADE
-          #post-up iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-          #post-up iptables -t nat -A POSTROUTING -s 172.29.236.0/22 -j MASQUERADE
-          #post-up iptables -t nat -A POSTROUTING -s 172.29.236.0/22 ! -d 172.29.236.0/22 -j MASQUERADE
           post-up service systemd-resolved restart
 
       # Bind the External VIP
@@ -162,4 +125,4 @@
 
 - name: Ensure oscontroller is up
   pause:
-    minutes: 5
+    minutes: 2

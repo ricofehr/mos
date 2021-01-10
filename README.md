@@ -1,22 +1,24 @@
 # os-ansible-poc
 
-Openstack installation with Vagrant : 1 controller/neutron, 1 cinder, 2 computes, with use of openstack-ansible project.
-Optionnaly, deploy into it a k8s on 6 vms : 1 master and 5 nodes.
+Openstack (stein release) installation with Vagrant : 1 controller/neutron, 1 cinder, 2 nova computes, with use of openstack-ansible project.
+Optionnaly, deploy on openstack a k8s (v1.12) on 6 vms : 1 master and 5 nodes.
 
 ## Requirements
 
 Ensure you have enough system resources
 - 6 CPU Cores
-- 90 Go RAM
-- Between 200Go and 2To Disk
+- 64 Go RAM
+- At least 200Go free disk space
 
 For setup execution, you need following packages/softwares on your workstation
-- An hypervisor : virtualbox or kvm (recommanded) with libvirtd
+- An hypervisor : virtualbox or kvm (with libvirtd)
 - Vagrant
 
 ## Libvirt vs Virtualbox
 
-Default is virtualbox provider install because virtualbox is easier to use and is compliant with majority of OS. But virtualbox dont provide well nested virtualization and has some constraints about vlan traffic flows.
+Need to enable virtualization (VT-x and VT-d) in your motherboard bios setting.
+
+Default is virtualbox provider install because virtualbox is easier to use and is compliant with majority of OS. But virtualbox dont provide performant nested virtualization and has some constraints about vlan traffic flows.
 
 If you are onto Linux, you should use libvirt provider instead, better performance and full nested virtualization
 - Install libvirtd daemon
@@ -28,7 +30,7 @@ Y
 $ cat /etc/modprobe.d/kvm.conf
 options kvm_intel nested=1
 ```
-- Install libvirt vagrant plugin: vagrant install
+- Install recent (>=0.3.0) libvirt vagrant plugin
 ```
 $ vagrant plugin install vagrant-libvirt
 ```
@@ -40,8 +42,8 @@ Execute ./up cmd with optional following options
 Usage: ./up [options]
 -h           this is some help text.
 -d           destroy all previously openstack install
--p xxxx      vagrant provider, default is virtualbox
--k           deploy k8s onto 3 vms (1 master and 2 nodes) after openstack install
+-p xxxx      vagrant provider virtualbox / libvirt, default is virtualbox
+-k           deploy k8s onto 6 vms (1 master and 5 nodes) after openstack install
 ```
 
 ## PostInstall Instructions
