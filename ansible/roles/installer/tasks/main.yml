@@ -66,9 +66,16 @@
 
 - name: clone openstack-ansible (stein release) repo
   shell: |
-    git clone -b stable/stein https://git.openstack.org/openstack/openstack-ansible
+    git clone https://git.openstack.org/openstack/openstack-ansible
   args:
     chdir: /opt
+  become: yes
+
+- name: Reset to victoria release
+  shell: |
+    git reset --hard 22.0.0
+  args:
+    chdir: /opt/openstack-ansible
   become: yes
 
 - name: bootstrap the osa project
@@ -79,15 +86,15 @@
     chdir: /opt/openstack-ansible
   become: yes
 
-- name: python-yaml library
+- name: python3-yaml library
   apt:
-    name: python-yaml
+    name: python3-yaml
     state: present
   become: yes
 
 - name: Default secrets
   shell: |
-    python pw-token-gen.py --file /etc/openstack_deploy/user_secrets.yml
+    python3 pw-token-gen.py --file /etc/openstack_deploy/user_secrets.yml
   args:
     chdir: /opt/openstack-ansible/scripts
   become: yes

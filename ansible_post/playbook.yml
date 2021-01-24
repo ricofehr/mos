@@ -148,7 +148,7 @@
   tasks:
     - name: Download terraform
       get_url:
-        url: https://releases.hashicorp.com/terraform/0.12.30/terraform_0.12.30_linux_amd64.zip
+        url: https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_linux_amd64.zip
         dest: /tmp/terraform.zip
       when: k8s_deploy == "1"
 

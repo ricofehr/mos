@@ -59,6 +59,11 @@
       iface eth2.30 inet manual
           vlan-raw-device eth2
 
+      # OpenStack Networking lbaas (octavia) VLAN interface
+      auto eth2.40
+      iface eth2.40 inet manual
+          vlan-raw-device eth2
+
       # OpenStack Networking VLAN interface for storage
       auto eth1.20
       iface eth1.20 inet manual
@@ -77,6 +82,15 @@
           post-up ethtool -K eth2 gro off
           post-up ip a add 192.168.90.1/24 dev br-vlan
           post-up iptables -t nat -A POSTROUTING -s 192.168.90.0/24 ! -d 192.168.90.0/24 -j MASQUERADE
+
+      auto br-lbaas
+      iface br-lbaas inet static
+          bridge_stp off
+          bridge_waitport 0
+          bridge_fd 0
+          bridge_ports eth2.40
+          address 172.29.232.1
+          netmask 255.255.252.0
 
 
       # Container/Host management bridge

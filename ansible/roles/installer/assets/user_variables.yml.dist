@@ -11,6 +11,13 @@ nova_resume_guests_state_on_host_boot: true
 
 neutron_plugin_base:
    - router
-   - neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2
+
+#the range of addresses which neutron can allocate for amphora VM
+octavia_management_net_subnet_allocation_pools: "172.29.232.10-172.29.235.200"
+
+octavia_provider_network_name: vlan
+octavia_provider_network_type: vlan
+octavia_provider_segmentation_id: 400
+octavia_container_network_name: lbaas_address
 
 nova_virt_type: kvm

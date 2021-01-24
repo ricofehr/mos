@@ -4,7 +4,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define :osinstaller do |uosi|
     uosi.vm.hostname = :osinstaller
-    uosi.vm.box = "generic/ubuntu1804"
+    uosi.vm.box = "generic/ubuntu2004"
     uosi.vm.provider :virtualbox do |virthost|
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
       virthost.customize ["modifyvm", :id, "--nic2", "intnet"]
@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define :oscontroller do |uosc|
     uosc.vm.hostname = :oscontroller
-    uosc.vm.box = "generic/ubuntu1804"
+    uosc.vm.box = "generic/ubuntu2004"
     uosc.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
@@ -49,20 +49,20 @@ Vagrant.configure("2") do |config|
       virthost.customize ["modifyvm", :id, "--nicpromisc3", "allow-vms"]
 
       # RAM / CPU
-      virthost.memory = 6144
-      virthost.cpus = 2
+      virthost.memory = 8192
+      virthost.cpus = 4
 
       # lxc containers filesystem
       unless File.exist?("/usr/local/vdis/os/disk_lxc.vdi")
         virthost.customize ["storagectl", :id, "--name", "SATA Controller", "--add", "sata", "--controller", "IntelAhci", "--portcount", "2", "--bootable", "off", "--hostiocache", "on"]
-        virthost.customize ["createmedium", "--filename", "/usr/local/vdis/os/disk_lxc.vdi", "--size", "153600", "--variant", "Standard"]
+        virthost.customize ["createmedium", "--filename", "/usr/local/vdis/os/disk_lxc.vdi", "--size", "53600", "--variant", "Fixed"]
       end
       virthost.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 0, "--device", 0, "--type", "hdd", "--medium", "/usr/local/vdis/os/disk_lxc.vdi", "--nonrotational", "on", "--discard", "on"]
      end
 
     uosc.vm.provider :libvirt do |virthost|
       virthost.memory = 8192
-      virthost.cpus = 2
+      virthost.cpus = 4
       virthost.driver = 'kvm'
       virthost.disk_bus = 'scsi'
       #virthost.disk_driver_opts :cache => "writeback", :io => "native", :discard => "unmap"
@@ -79,7 +79,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define :oscompute1 do |uosnv|
     uosnv.vm.hostname = :oscompute1
-    uosnv.vm.box = "generic/ubuntu1804"
+    uosnv.vm.box = "generic/ubuntu2004"
     uosnv.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
@@ -132,7 +132,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define :oscompute2 do |uosnv2|
     uosnv2.vm.hostname = :oscompute2
-    uosnv2.vm.box = "generic/ubuntu1804"
+    uosnv2.vm.box = "generic/ubuntu2004"
     uosnv2.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
@@ -185,7 +185,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define :osstorage do |uosst|
     uosst.vm.hostname = :osstorage
-    uosst.vm.box = "generic/ubuntu1804"
+    uosst.vm.box = "generic/ubuntu2004"
     uosst.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
@@ -199,7 +199,7 @@ Vagrant.configure("2") do |config|
       virthost.auto_nat_dns_proxy = false
 
       # RAM / CPU
-      virthost.memory = 4096
+      virthost.memory = 3072
       virthost.cpus = 2
 
       # Cinder LVM filesystem
@@ -211,7 +211,7 @@ Vagrant.configure("2") do |config|
     end
 
     uosst.vm.provider :libvirt do |virthost|
-      virthost.memory = 4096
+      virthost.memory = 3072
       virthost.cpus = 2
       virthost.driver = 'kvm'
       virthost.disk_bus = 'scsi'
