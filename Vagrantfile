@@ -9,9 +9,7 @@ Vagrant.configure("2") do |config|
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
       virthost.customize ["modifyvm", :id, "--nic2", "intnet"]
       virthost.customize ["modifyvm", :id, "--nictype2", "virtio"]
-      virthost.customize ["modifyvm", :id, "--nic3", "intnet"]
       virthost.customize ["modifyvm", :id, "--nictype3", "virtio"]
-      virthost.customize ["modifyvm", :id, "--nictype4", "virtio"]
       virthost.memory = 2048
       virthost.cpus = 2
     end
@@ -25,9 +23,7 @@ Vagrant.configure("2") do |config|
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
-    uosi.vm.network :private_network, ip: "192.168.80.20", netmask: "255.255.255.128"
-    # Neutron network vlan for openstack network stacks management
-    uosi.vm.network :private_network, ip: "192.168.85.20", netmask: "255.255.255.128"
+    uosi.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.20", netmask: "255.255.255.128", virtualbox__intnet: "os_mgmt"
     # Default input ip, used mainly for ansible reachablity
     uosi.vm.network :private_network, ip: "192.168.95.20", netmask: "255.255.255.128"
   end
@@ -49,7 +45,7 @@ Vagrant.configure("2") do |config|
       virthost.customize ["modifyvm", :id, "--nicpromisc3", "allow-vms"]
 
       # RAM / CPU
-      virthost.memory = 8192
+      virthost.memory = 16384
       virthost.cpus = 4
 
       # lxc containers filesystem
@@ -61,7 +57,7 @@ Vagrant.configure("2") do |config|
      end
 
     uosc.vm.provider :libvirt do |virthost|
-      virthost.memory = 8192
+      virthost.memory = 16384
       virthost.cpus = 4
       virthost.driver = 'kvm'
       virthost.disk_bus = 'scsi'
@@ -70,9 +66,9 @@ Vagrant.configure("2") do |config|
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
-    uosc.vm.network :private_network, ip: "192.168.80.70", netmask: "255.255.255.128"
+    uosc.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.70", netmask: "255.255.255.128", virtualbox__intnet: "os_mgmt"
     # Neutron network vlan for openstack network stacks management
-    uosc.vm.network :private_network, ip: "192.168.85.70", netmask: "255.255.255.128"
+    uosc.vm.network :private_network, libvirt__network_name: "os_net", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.85.70", netmask: "255.255.255.128", virtualbox__intnet: "os_net", auto_config: false
     # Default input ip, used mainly for ansible reachablity
     uosc.vm.network :private_network, ip: "192.168.95.70", netmask: "255.255.255.128"
   end
@@ -96,7 +92,7 @@ Vagrant.configure("2") do |config|
       virthost.auto_nat_dns_proxy = false
 
       # RAM / CPU
-      virthost.memory = 24576
+      virthost.memory = 20480
       virthost.cpus = 6
 
       # Nova libvirt filesystem
@@ -111,7 +107,7 @@ Vagrant.configure("2") do |config|
     end
 
     uosnv.vm.provider :libvirt do |virthost|
-      virthost.memory = 24576
+      virthost.memory = 20480
       virthost.cpus = 6
       virthost.nested = true
       virthost.driver = 'kvm'
@@ -123,9 +119,10 @@ Vagrant.configure("2") do |config|
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
-    uosnv.vm.network :private_network, :ip => "192.168.80.75", :netmask => "255.255.255.128"
+    uosnv.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.75", netmask: "255.255.255.128", virtualbox__intnet: "os_mgmt"
     # Neutron network vlan for openstack network stacks management
-    uosnv.vm.network :private_network, :ip => "192.168.85.75", :netmask => "255.255.255.128"
+    uosnv.vm.network :private_network, libvirt__network_name: "os_net", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.85.75", netmask: "255.255.255.128", virtualbox__intnet: "os_net", auto_config: false
+
     # Default input ip, used mainly for ansible reachablity
     uosnv.vm.network :private_network, :ip => "192.168.95.75", :netmask => "255.255.255.128"
   end
@@ -149,7 +146,7 @@ Vagrant.configure("2") do |config|
       virthost.auto_nat_dns_proxy = false
 
       # RAM / CPU
-      virthost.memory = 24576
+      virthost.memory = 20480
       virthost.cpus = 6
 
       # Nova libvirt filesystem
@@ -164,7 +161,7 @@ Vagrant.configure("2") do |config|
     end
 
     uosnv2.vm.provider :libvirt do |virthost|
-      virthost.memory = 24576
+      virthost.memory = 20480
       virthost.cpus = 6
       virthost.nested = true
       virthost.driver = 'kvm'
@@ -176,9 +173,10 @@ Vagrant.configure("2") do |config|
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
-    uosnv2.vm.network :private_network, :ip => "192.168.80.76", :netmask => "255.255.255.128"
+    uosnv2.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.76", netmask: "255.255.255.128", virtualbox__intnet: "os_mgmt"
     # Neutron network vlan for openstack network stacks management
-    uosnv2.vm.network :private_network, :ip => "192.168.85.76", :netmask => "255.255.255.128"
+    uosnv2.vm.network :private_network, libvirt__network_name: "os_net", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.85.76", netmask: "255.255.255.128", virtualbox__intnet: "os_net", auto_config: false
+
     # Default input ip, used mainly for ansible reachablity
     uosnv2.vm.network :private_network, :ip => "192.168.95.76", :netmask => "255.255.255.128"
  end
@@ -191,9 +189,7 @@ Vagrant.configure("2") do |config|
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
       virthost.customize ["modifyvm", :id, "--nic2", "intnet"]
       virthost.customize ["modifyvm", :id, "--nictype2", "virtio"]
-      virthost.customize ["modifyvm", :id, "--nic3", "intnet"]
       virthost.customize ["modifyvm", :id, "--nictype3", "virtio"]
-      virthost.customize ["modifyvm", :id, "--nictype4", "virtio"]
 
       # disable dns server from host
       virthost.auto_nat_dns_proxy = false
@@ -220,9 +216,7 @@ Vagrant.configure("2") do |config|
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
-    uosst.vm.network :private_network, :ip => "192.168.80.80", :netmask => "255.255.255.128"
-    # Neutron network vlan for openstack network stacks management
-    uosst.vm.network :private_network, :ip => "192.168.85.80", :netmask => "255.255.255.128"
+    uosst.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.80", netmask: "255.255.255.128", virtualbox__intnet: "os_mgmt"
     # Default input ip, used mainly for ansible reachablity
     uosst.vm.network :private_network, :ip => "192.168.95.80", :netmask => "255.255.255.128"
   end

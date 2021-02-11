@@ -1,15 +1,6 @@
-- hosts:
-    - osinstaller
-    - oscompute1
-    - oscompute2
-    - osstorage
-  serial: 1
-  strategy: linear
-  roles:
-    - role: systemd_dns
+---
 
 - hosts: all 
-  serial: 1
   strategy: linear
   roles:
     - role: base

@@ -18,7 +18,8 @@ For setup execution, you need following packages/softwares on your workstation
 
 Need to enable virtualization (VT-x and VT-d) in your motherboard bios setting.
 
-Default is virtualbox provider install because virtualbox is easier to use and is compliant with majority of OS. But virtualbox dont provide performant nested virtualization and has some constraints about vlan traffic flows.
+Default is virtualbox provider install because virtualbox is easier to use and is compliant with majority of OS.
+But virtualbox dont provide performant nested virtualization and has some constraints about vlan traffic flows.
 
 If you are onto Linux, you should use libvirt provider instead, better performance and full nested virtualization
 - Install libvirtd daemon
@@ -75,8 +76,7 @@ This deployment uses this k8s install repository: https://github.com/ricofehr/k8
 
 Once k8s deployed, get the "loadbalancer k8s" floating ip from openstack dashboard and add this line to your /etc/hosts file
 ```
-LOADBALANCERIP gitea.k8s.local sonar.k8s.local jenkinsx.k8s.local dashboard.k8s.local regi
-stry.k8s.local
+LOADBALANCERIP gitea.k8s.local sonar.k8s.local jenkinsx.k8s.local dashboard.k8s.local registry.k8s.local
 ```
 
 After that you can reach the following urls (other tools in next releases)
