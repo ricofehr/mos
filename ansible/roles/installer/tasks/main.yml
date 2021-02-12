@@ -1,5 +1,12 @@
 ---
 
+- name: Logs folder
+  file:
+    path: ~/logs
+    owner: "{{ ansible_user }}"
+    state: directory
+    mode: 0775
+
 - name: Swap off
   shell: |
     swapoff -a
@@ -127,34 +134,46 @@
   when: hostvars[inventory_hostname]['ansible_host'] is defined
   become: yes
 
-- name: Execute openstack-ansible setup-hosts
+- name: Execute openstack-ansible setup-hosts (try 2 times if error occured)
   shell: |
-    openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-hosts.yml >~/loghosts 2>&1
+    openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-hosts.yml >{{ ansible_env.HOME }}/logs/loghosts_$(date +%s) 2>&1
   args:
     chdir: /opt/openstack-ansible/playbooks
+  retries: 2
+  delay: 5
+  register: result
+  until: result.rc == 0
   become: yes
 
 - name: Pause after setup hosts
   pause:
     minutes: 1
 
-- name: Execute openstack-ansible setup-infra
+- name: Execute openstack-ansible setup-infra (try 2 times if error occured)
   shell: |
-    openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-infrastructure.yml >~/loginfra 2>&1
+    openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-infrastructure.yml >{{ ansible_env.HOME }}/logs/loginfra_$(date +%s) 2>&1
   args:
     chdir: /opt/openstack-ansible/playbooks
+  retries: 2
+  delay: 5
+  register: result
+  until: result.rc == 0
   become: yes
 
 - name: Pause after setup infra
   pause:
     minutes: 1
 
-- name: Execute openstack-ansible setup-openstack
+- name: Execute openstack-ansible setup-openstack (could retry at most 3 times if error occurs because temporary network issue)
   shell: |
-    openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-openstack.yml >~/logos 2>&1
+    openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-openstack.yml >{{ ansible_env.HOME }}/logs/logos_$(date +%s) 2>&1
   args:
     executable: /bin/bash
     chdir: /opt/openstack-ansible/playbooks
+  retries: 3
+  delay: 5
+  register: result
+  until: result.rc == 0
   become: yes
 
 - name: Pause after setup openstack
