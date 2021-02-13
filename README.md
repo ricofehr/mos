@@ -1,7 +1,7 @@
 # os-ansible-poc
 
 Openstack (victoria release) installation with Vagrant : 1 controller/neutron, 1 cinder, 2 nova computes, with use of openstack-ansible project.
-Optionnaly, deploy on openstack a k8s (v1.12) on 6 vms : 1 master and 5 nodes.
+Optionnaly, deploy on openstack a k8s (v1.20) on 6 vms : 1 master and 5 nodes.
 
 ## Requirements
 
