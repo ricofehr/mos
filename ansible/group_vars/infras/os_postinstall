@@ -1,0 +1,25 @@
+---
+
+os_postinstall_firstboot_creates_path: "{{ global_all_firstboot_creates_path }}"
+
+os_postinstall_project: "{{ global_os_project }}"
+os_postinstall_user: "{{ global_os_user }}"
+os_postinstall_password: "{{ global_os_password }}"
+
+os_postinstall_dns_server: "{{ global_os_dns_server }}"
+os_postinstall_mgmt_project: service
+os_postinstall_router_name: "{{ global_os_router_name }}"
+os_postinstall_public_name: "{{ global_os_public_network_name }}"
+os_postinstall_public_subnet: "{{ global_os_public_subnet }}"
+os_postinstall_public_gw: "{{ global_os_public_gw }}"
+os_postinstall_public_allocation_pool: "{{ global_os_public_allocation_pool }}"
+os_postinstall_private_name: "{{ global_os_private_network_name }}"
+os_postinstall_private_subnet: "{{ global_os_private_subnet }}"
+
+os_postinstall_flavors: "{{ global_os_flavors }}"
+os_postinstall_quotas: "{{ global_os_quotas }}"
+os_postinstall_images: "{{ global_os_images }}"
+
+os_postinstall_k8s_deploy: "{{ global_k8s_deploy }}"
+os_postinstall_k8s_os_secgrp: "{{ global_k8s_os_secgrp }}"
+

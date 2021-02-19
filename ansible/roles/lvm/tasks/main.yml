@@ -1,0 +1,7 @@
+---
+
+- name: Create a volume group
+  lvg:
+    vg: "{{ lvm_vg_name }}"
+    pvs: "{{ lvm_device }}"
+  become: yes

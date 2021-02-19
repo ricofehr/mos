@@ -1,0 +1,14 @@
+---
+
+k8s_deploy_logs_folder: "{{ ansible_env.HOME }}/logs"
+k8s_deploy_haproxy_ssl_crt_content: "{{ hostvars[groups['infras'][0]]['k8s_deploy_haproxy_ssl_crt'].stdout }}"
+k8s_deploy_haproxy_ssl_crt_folder: "{{ ansible_env.HOME }}/os_crt"
+k8s_deploy_haproxy_ssl_crt_path: "{{ k8s_deploy_haproxy_ssl_crt_folder }}/cloud.crt"
+
+k8s_deploy_os_private_network_id: "{{ hostvars[groups['infras'][0]]['k8s_deploy_os_private_network_id'].stdout }}"
+k8s_deploy_os_public_network_id: "{{ hostvars[groups['infras'][0]]['k8s_deploy_os_public_network_id'].stdout }}"
+
+k8s_deploy_version: "{{ global_k8s_repo_release }}"
+k8s_deploy_ubuntu_os_img: "{{ global_k8s_ubuntu_os_img }}"
+k8s_deploy_firstboot_creates_path: "{{ global_all_firstboot_creates_path }}"
+

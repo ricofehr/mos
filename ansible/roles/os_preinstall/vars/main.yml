@@ -1,0 +1,11 @@
+---
+
+os_preinstall_cidr_networks:
+  - name: "{{ os_preinstall_mgmt_network_name }}"
+    network: "{{ os_preinstall_mgmt_subnet }}"
+  - name: "{{ os_preinstall_tunnel_network_name }}"
+    network: "{{ os_preinstall_tunnel_subnet }}"
+  - name: "{{ os_preinstall_storage_network_name }}"
+    network: "{{ os_preinstall_storage_subnet }}"
+  - name: "{{ os_preinstall_lbaas_network_name }}"
+    network: "{{ os_preinstall_lbaas_subnet }}"

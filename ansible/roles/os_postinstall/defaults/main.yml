@@ -1,0 +1,40 @@
+---
+os_postinstall_firstboot_creates_path: ~/.first_try
+
+os_postinstall_project: project
+os_postinstall_user: user
+os_postinstall_password: pass1234
+os_postinstall_dns_server: 8.8.8.8
+os_postinstall_mgmt_project: service
+os_postinstall_router_name: router
+os_postinstall_public_name: public
+os_postinstall_public_subnet: 192.168.76.0/24
+os_postinstall_public_gw: 192.168.76.1
+os_postinstall_public_allocation_pool: "start=192.168.76.50,end=192.168.76.250"
+os_postinstall_private_name: private
+os_postinstall_private_subnet: 10.8.134.0/24
+
+os_postinstall_flavors:
+  - name: medium
+    cpus: 2
+    ram: 2048
+    disk: 30
+
+os_postinstall_quotas:
+  instances: 10
+  keypairs: 20
+  cores: 20
+  ram: 61400
+  servergroups: 32
+  diskspace: 320
+  volumes: 32
+  snapshots: 12
+  floatingips: 100
+
+os_postinstall_images:
+  - name: focal
+    url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+
+os_postinstall_k8s_deploy: 0
+os_postinstall_k8s_os_secgrp: k8s
+

@@ -1,0 +1,8 @@
+---
+
+- sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+  loop: "{{ sysctl_list }}"
+  become: yes

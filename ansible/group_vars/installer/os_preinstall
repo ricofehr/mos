@@ -1,0 +1,56 @@
+---
+
+os_preinstall_firstboot_creates_path: "{{ global_all_firstboot_creates_path }}"
+os_preinstall_logs_folder: "{{ ansible_env.HOME }}/logs"
+
+os_preinstall_mgmt_network_name: "{{ global_os_mgmt_network_name }}"
+os_preinstall_mgmt_network_bridge: "{{ global_os_mgmt_network_bridge }}"
+os_preinstall_mgmt_subnet: "{{ global_os_mgmt_subnet }}"
+os_preinstall_mgmt_gw: "{{ global_os_mgmt_gw }}"
+os_preinstall_mgmt_infra_ip: "{{ global_os_mgmt_infra_ip }}"
+os_preinstall_mgmt_installer_ip: "{{ global_os_mgmt_installer_ip }}"
+os_preinstall_mgmt_compute1_ip: "{{ global_os_mgmt_compute1_ip }}"
+os_preinstall_mgmt_compute2_ip: "{{ global_os_mgmt_compute2_ip }}"
+os_preinstall_mgmt_storage_ip: "{{ global_os_mgmt_storage_ip }}"
+os_preinstall_mgmt_used_ips: "{{ global_os_mgmt_used_ips }}"
+
+os_preinstall_tunnel_network_name: "{{ global_os_tunnel_network_name }}"
+os_preinstall_tunnel_network_name_flat: "flat"
+os_preinstall_tunnel_network_bridge: "{{ global_os_tunnel_network_bridge }}"
+os_preinstall_tunnel_subnet: "{{ global_os_tunnel_subnet }}"
+os_preinstall_tunnel_gw: "{{ global_os_tunnel_gw }}"
+os_preinstall_tunnel_used_ips: "{{ global_os_tunnel_used_ips }}"
+
+os_preinstall_storage_network_name: "{{ global_os_storage_network_name }}"
+os_preinstall_storage_subnet: "{{ global_os_storage_subnet }}"
+os_preinstall_storage_gw: "{{ global_os_storage_gw }}"
+os_preinstall_storage_used_ips: "{{ global_os_storage_used_ips }}"
+os_preinstall_storage_vg: "{{ global_os_lvm_vg }}"
+
+os_preinstall_lbaas_network_name: "{{ global_os_lbaas_network_name }}"
+os_preinstall_lbaas_subnet: "{{ global_os_lbaas_subnet }}"
+os_preinstall_lbaas_gw: "{{ global_os_lbaas_gw }}"
+os_preinstall_lbaas_used_ips: "{{ global_os_lbaas_used_ips }}"
+
+os_preinstall_octavia_allocation_pool: "{{ global_os_lbaas_subnet_range }}"
+os_preinstall_octavia_vlan_id: 350
+
+os_preinstall_vlan_network_bridge: "{{ global_os_vlan_network_bridge }}"
+os_preinstall_vlan_network_name: "{{ global_os_vlan_network_name }}"
+os_preinstall_vlan_network_name_flat: "{{ global_os_vlan_network_name_flat }}"
+
+os_preinstall_used_ips:
+  - "{{ os_preinstall_mgmt_gw }}"
+  - "{{ os_preinstall_mgmt_installer_ip }}"
+  - "{{ os_preinstall_mgmt_used_ips }}"
+  - "{{ os_preinstall_tunnel_gw }}"
+  - "{{ os_preinstall_tunnel_used_ips }}"
+
+os_preinstall_external_lb_vip: "{{ global_os_lb_external_vip }}"
+os_preinstall_internal_lb_vip: "{{ global_os_lb_internal_vip }}"
+
+os_preinstall_admin_password: "{{ global_os_admin_password }}"
+os_preinstall_osa_version: "{{ global_os_osa_version }}"
+os_preinstall_nova_virt_type: "{{ global_os_nova_virt_type }}"
+os_preinstall_nova_cpus_ratio: "{{ global_os_nova_cpus_ratio }}"
+

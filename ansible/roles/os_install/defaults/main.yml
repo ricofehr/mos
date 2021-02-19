@@ -1,0 +1,4 @@
+---
+
+os_install_firstboot_creates_path: "~/.first_try"
+os_install_logs_folder: "{{ ansible_env.HOME }}/logs"

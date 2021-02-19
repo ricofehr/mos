@@ -1,37 +1,72 @@
----
+- hosts: infras
+  serial: 1
+  strategy: linear
+  roles:
+    - role: ssl_altname
+      tags: [prerequisites, ssl_altname]
 
 - hosts: all 
   strategy: linear
   roles:
     - role: base
-    - role: prerequisites
+      tags: [prerequisites, base]
+    - role: osa_sshkeys
+      tags: [prerequisites, osa_sshkeys]
+    - role: swapoff
+      tags: [prerequisites, swap]
+    - role: sysctl
+      tags: [prerequisites, sysctl]
+    - role: network_config
+      tags: [prerequisites, network]
 
-- hosts: oscontroller
+- hosts:
+    - infras
+    - computes
+  strategy: linear
+  roles:
+    - role: disk
+      tags: [prerequisites, disk]
+
+- hosts:
+    - storages
+  strategy: linear
+  roles:
+    - role: lvm
+      tags: [prerequisites, lvm]
+
+- hosts:
+    - computes
+    - storages
+  strategy: linear
+  roles:
+    - role: end
+      tags: [prerequisites]
+
+- hosts: installer
   serial: 1
   strategy: linear
   roles:
-    - controller
+    - role: os_preinstall
+      tags: [os, os_preinstall]
+    - role: os_install
+      tags: [os, os_install]
 
-- hosts: oscompute1
+- hosts: infras
   serial: 1
   strategy: linear
   roles:
-    - compute1
+    - role: os_postinstall
+      tags: [os, postinstall, os_postinstall]
+    - role: end
+      tags: [postinstall]
 
-- hosts: oscompute2
+- hosts: installer
   serial: 1
   strategy: linear
   roles:
-    - compute2
+    - role: k8s_deploy
+      when: global_k8s_deploy == "1"
+      tags: [postinstall, k8s_deploy]
+    - role: end
+      tags: [postinstall]
 
-- hosts: osstorage
-  serial: 1
-  strategy: linear
-  roles:
-    - cinder
-
-- hosts: osinstaller
-  serial: 1
-  strategy: linear
-  roles:
-    - installer

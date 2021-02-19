@@ -1,0 +1,12 @@
+---
+
+- name: Swap off
+  shell: |
+    swapoff -a
+    sed -i 's/^.*swap.*$/#/g' /etc/fstab
+  args:
+    executable: /bin/bash
+    creates: "{{ swapoff_firstboot_creates_path }}"
+    warn: no
+  become: yes
+

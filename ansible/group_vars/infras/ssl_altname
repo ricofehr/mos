@@ -1,0 +1,3 @@
+---
+
+ssl_altname_value: "IP:{{ global_os_lb_external_vip }}" 

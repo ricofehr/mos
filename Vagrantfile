@@ -2,8 +2,8 @@ Vagrant.configure("2") do |config|
   config.ssh.username = "vagrant"
   config.ssh.insert_key = false
 
-  config.vm.define :osinstaller do |uosi|
-    uosi.vm.hostname = :osinstaller
+  config.vm.define :installer1 do |uosi|
+    uosi.vm.hostname = :installer1
     uosi.vm.box = "generic/ubuntu2004"
     uosi.vm.provider :virtualbox do |virthost|
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
@@ -28,8 +28,8 @@ Vagrant.configure("2") do |config|
     uosi.vm.network :private_network, ip: "192.168.95.20", netmask: "255.255.255.128"
   end
 
-  config.vm.define :oscontroller do |uosc|
-    uosc.vm.hostname = :oscontroller
+  config.vm.define :infra1 do |uosc|
+    uosc.vm.hostname = :infra1
     uosc.vm.box = "generic/ubuntu2004"
     uosc.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
@@ -73,8 +73,8 @@ Vagrant.configure("2") do |config|
     uosc.vm.network :private_network, ip: "192.168.95.70", netmask: "255.255.255.128"
   end
 
-  config.vm.define :oscompute1 do |uosnv|
-    uosnv.vm.hostname = :oscompute1
+  config.vm.define :compute1 do |uosnv|
+    uosnv.vm.hostname = :compute1
     uosnv.vm.box = "generic/ubuntu2004"
     uosnv.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
@@ -127,8 +127,8 @@ Vagrant.configure("2") do |config|
     uosnv.vm.network :private_network, :ip => "192.168.95.75", :netmask => "255.255.255.128"
   end
 
-  config.vm.define :oscompute2 do |uosnv2|
-    uosnv2.vm.hostname = :oscompute2
+  config.vm.define :compute2 do |uosnv2|
+    uosnv2.vm.hostname = :compute2
     uosnv2.vm.box = "generic/ubuntu2004"
     uosnv2.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
@@ -181,8 +181,8 @@ Vagrant.configure("2") do |config|
     uosnv2.vm.network :private_network, :ip => "192.168.95.76", :netmask => "255.255.255.128"
  end
 
-  config.vm.define :osstorage do |uosst|
-    uosst.vm.hostname = :osstorage
+  config.vm.define :storage1 do |uosst|
+    uosst.vm.hostname = :storage1
     uosst.vm.box = "generic/ubuntu2004"
     uosst.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans

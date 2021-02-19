@@ -1,0 +1,78 @@
+---
+
+- name: Logs folder
+  file:
+    path: "{{ k8s_deploy_logs_folder }}"
+    owner: "{{ ansible_user }}"
+    state: directory
+    mode: 0775
+  become: yes
+
+- name: Download terraform
+  get_url:
+    url: "{{ k8s_deploy_tf_download_url }}" 
+    dest: /tmp/terraform.zip
+
+- name: Install terraform
+  shell: |
+    unzip terraform.zip
+    mv terraform /usr/bin/
+    chmod +x /usr/bin/terraform
+  args:
+    chdir: /tmp
+    executable: /bin/bash
+    creates: "{{ k8s_deploy_firstboot_creates_path }}"
+    warn: no
+  become: yes
+
+- name: OS crt folder
+  file:
+    path: "{{ k8s_deploy_haproxy_ssl_crt_folder }}"
+    owner: "{{ ansible_user }}"
+    state: directory
+    mode: 0775
+  become: yes
+
+- name: Prepare openstack ssl cert
+  copy:
+    content: |
+             {{ k8s_deploy_haproxy_ssl_crt_content }}
+    dest: "{{ k8s_deploy_haproxy_ssl_crt_path }}"
+    mode: 0644
+
+- name: generate ssh rsa keys for current user
+  shell: |
+    mkdir -p {{ ansible_env.HOME }}/.ssh
+    rm -f {{ ansible_env.HOME }}/.ssh/id_rsa*
+    ssh-keygen -t rsa -N "" -f {{ ansible_env.HOME }}/.ssh/id_rsa
+  args:
+    executable: /bin/bash
+    creates: "{{ k8s_deploy_firstboot_creates_path }}"
+    warn: no
+
+- name: Pip3 install
+  apt:
+    name: python3-pip
+    state: present
+  become: yes
+
+- name: Ensure ansible {{ k8s_deploy_ansible_version }} for current user
+  pip:
+    name: ansible=={{ k8s_deploy_ansible_version }}
+    executable: pip3
+    extra_args: --user
+
+- name: clone k8s install repo
+  git:
+    repo: "{{ k8s_deploy_repo_url }}"
+    version: "{{ k8s_deploy_version }}"
+    dest: ~/k8s
+
+- name: Deploy k8s
+  shell: |
+    ./deployos -o {{ k8s_deploy_ubuntu_os_img }} -snet {{ k8s_deploy_os_private_network_id }} -fip {{ k8s_deploy_os_public_network_id }} -oscrt {{ k8s_deploy_haproxy_ssl_crt_path }} -w ~/.local/bin/ansible-playbook >{{ k8s_deploy_logs_folder}}/log_k8s_$(date +%s) 2>&1
+  args:
+    chdir: ~/k8s
+    executable: /bin/bash
+    creates: "{{ k8s_deploy_firstboot_creates_path }}"
+

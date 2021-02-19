@@ -1,0 +1,25 @@
+---
+
+- name: Create a new ext4 primary partition
+  parted:
+    device: "{{ disk_device }}"
+    number: 1
+    state: present
+    #fs_type: "{{ disk_type }}"
+  become: yes
+
+- name: Create a ext4 filesystem
+  filesystem:
+    fstype: "{{ disk_type }}"
+    dev: "{{ disk_partition }}"
+  become: yes
+
+- name: Mount and bind a volume
+  mount:
+    path: "{{ disk_mount_path }}" 
+    src: "{{ disk_partition }}"
+    opts: noatime,nobarrier
+    state: mounted
+    fstype: "{{ disk_type }}"
+  become: yes
+

@@ -1,0 +1,33 @@
+---
+# This file contains an example of the global variable overrides
+# which may need to be set for a production environment.
+
+openstack_service_publicuri_proto: https
+haproxy_ssl: true
+horizon_enable_ssl: true
+haproxy_ssl_self_signed_regen: yes
+haproxy_ssl_self_signed_subject: "/C=FR/ST=IDFs/L=Paris/O=IT/CN={{ os_preinstall_external_lb_vip }}"
+
+nova_nova_conf_overrides:
+  DEFAULT:
+    resume_guests_state_on_host_boot: true
+    update_resources_interval: 30
+    reserved_host_memory_mb: 1024
+
+nova_user_pip_packages:
+  - etcd3gw
+
+nova_cpu_allocation_ratio: {{ os_preinstall_nova_cpus_ratio }}
+nova_virt_type: {{ os_preinstall_nova_virt_type }}
+
+neutron_plugin_base:
+   - router
+
+octavia_management_net_subnet_allocation_pools: "{{ os_preinstall_octavia_allocation_pool }}"
+octavia_management_net_subnet_cidr: {{ os_preinstall_lbaas_subnet }}
+octavia_ssh_enabled: true
+octavia_neutron_management_network_name: {{ os_preinstall_lbaas_network_name }}-mgmt
+octavia_container_network_name: {{ os_preinstall_lbaas_network_name }}_address
+octavia_provider_network_name: vlan
+octavia_provider_network_type: vlan
+octavia_provider_segmentation_id: {{ os_preinstall_octavia_vlan_id }}

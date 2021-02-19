@@ -1,0 +1,38 @@
+---
+
+network_config_ip_id: "{{ ansible_host.split('.')[3] }}"
+network_config_eth1_vlan_1: "{{ global_eth1_vlan_1 }}"
+network_config_eth1_vlan_2: "{{ global_eth1_vlan_2 }}"
+
+network_config_brmgmt_address: "{{ global_os_mgmt_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
+network_config_brstorage_address: "{{ global_os_storage_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
+
+network_config_block: |
+  # Container/Host management VLAN interface
+  auto eth1.{{ network_config_eth1_vlan_1 }}
+  iface eth1.{{ network_config_eth1_vlan_1 }} inet manual
+      vlan-raw-device eth1
+
+  # OpenStack Networking VLAN interface for storage
+  auto eth1.{{ network_config_eth1_vlan_2 }}
+  iface eth1.{{ network_config_eth1_vlan_2 }} inet manual
+      vlan-raw-device eth1
+  
+  # Container/Host management bridge
+  auto br-mgmt
+  iface br-mgmt inet static
+      bridge_stp off
+      bridge_waitport 0
+      bridge_fd 0
+      bridge_ports eth1.{{ network_config_eth1_vlan_1 }}
+      address {{ network_config_brmgmt_address }}
+  
+  # Storage bridge
+  auto br-storage
+  iface br-storage inet static
+      bridge_stp off
+      bridge_waitport 0
+      bridge_fd 0
+      bridge_ports eth1.{{ network_config_eth1_vlan_2 }}
+      address {{ network_config_brstorage_address }}
+

@@ -1,12 +1,12 @@
 [installer]
-osinstaller ansible_host=192.168.95.20 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3
+installer1 ansible_host=192.168.95.20 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3
 
-[controller]
-oscontroller ansible_host=192.168.95.70 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3
+[infras]
+infra1 ansible_host=192.168.95.70 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3
 
 [computes]
-oscompute1 ansible_host=192.168.95.75 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3
-oscompute2 ansible_host=192.168.95.76 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3
+compute1 ansible_host=192.168.95.75 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3
+compute2 ansible_host=192.168.95.76 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3
 
-[storage]
-osstorage ansible_host=192.168.95.80 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3
+[storages]
+storage1 ansible_host=192.168.95.80 ansible_user=vagrant ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key ansible_python_interpreter=/usr/bin/python3

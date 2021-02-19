@@ -1,0 +1,13 @@
+---
+
+k8s_deploy_logs_folder: "/tmp/logs"
+k8s_deploy_haproxy_ssl_crt_content: ""
+k8s_deploy_haproxy_ssl_crt_folder: "/tmp/os_crt"
+k8s_deploy_haproxy_ssl_crt_path: "{{ k8s_deploy_haproxy_ssl_crt_folder }}/cloud.crt"
+
+k8s_deploy_os_private_network_id: "1"
+k8s_deploy_os_public_network_id: "2"
+
+k8s_deploy_version: v0.1
+k8s_deploy_ubuntu_os_img: focal
+k8s_deploy_firstboot_creates_path: .firstboot

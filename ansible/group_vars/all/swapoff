@@ -1,0 +1,4 @@
+---
+
+swapoff_firstboot_creates_path: "{{ global_all_firstboot_creates_path }}"
+

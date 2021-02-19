@@ -1,0 +1,130 @@
+---
+
+global_all_firstboot_creates_path: "{{ ansible_env.HOME }}/.ansible/.first_boot"
+
+global_eth1_vlan_1: 10
+global_eth1_vlan_2: 20
+global_eth2_vlan_1: 30
+global_eth2_vlan_2: 40
+
+global_installer_node_suffix: 20
+global_infra_node_suffix: 70
+global_compute1_node_suffix: 75
+global_compute2_node_suffix: 76
+global_storage_node_suffix: 80
+
+global_k8s_deploy: 1
+global_k8s_repo_release: "v0.1"
+global_k8s_ubuntu_os_img: "focal"
+global_k8s_os_secgrp: "k8s"
+
+global_os_osa_version: "22.0.1"
+
+global_os_region: "RegionOne"
+global_os_project: "tenant0"
+global_os_user: "tenant0"
+global_os_password: "tenant0"
+global_os_admin_password: "toor"
+global_os_dns_server: "127.0.0.53"
+global_os_lvm_vg: "cinder-volumes"
+global_os_nova_virt_type: "kvm"
+global_os_nova_cpus_ratio: 12.0
+
+global_os_router_name: tenant0
+global_os_public_network_name: "public" 
+global_os_public_network: "192.168.90"
+global_os_public_network_prefix: 24
+global_os_public_gw: "{{ global_os_public_network }}.1"
+global_os_public_subnet: "{{ global_os_public_network }}.0/{{ global_os_public_network_prefix }}"
+global_os_public_allocation_pool: "start={{ global_os_public_network }}.100,end={{ global_os_public_network }}.254"
+global_os_private_network_name: "private" 
+global_os_private_network: "10.171.0" 
+global_os_private_network_prefix: 24
+global_os_private_subnet: "{{ global_os_private_network }}.0/{{ global_os_private_network_prefix }}"
+global_os_private_subnet_range: "{{ global_os_private_network }}.100,{{ global_os_private_network }}.200"
+
+global_os_flavors:
+  - name: small
+    cpus: 1
+    ram: 1024
+    disk: 20
+  - name: medium
+    cpus: 2
+    ram: 2048
+    disk: 40
+  - name: xmedium
+    cpus: 3
+    ram: 2048
+    disk: 40
+  - name: large
+    cpus: 3
+    ram: 3072
+    disk: 60
+  - name: xlarge
+    cpus: 4
+    ram: 4096
+    disk: 80
+
+global_os_quotas:
+  instances: 100
+  keypairs: 200
+  cores: 200
+  ram: 122800
+  servergroups: 120
+  diskspace: 4000
+  volumes: 120
+  snapshots: 120
+  floatingips: 100
+
+global_os_images:
+  - name: bionic
+    url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+  - name: focal
+    url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+  - name: centos7
+    url: http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+
+global_os_prefix: 22
+global_os_vlan_network_bridge: br-vlan
+global_os_vlan_network_name: vlan
+global_os_vlan_network_name_flat: flat
+
+global_os_mgmt_network_name: container
+global_os_mgmt_network_bridge: br-mgmt
+global_os_mgmt_network: 172.29.236
+global_os_mgmt_subnet: "{{ global_os_mgmt_network }}.0/{{ global_os_prefix }}"
+global_os_mgmt_gw: "{{ global_os_mgmt_network }}.1"
+global_os_mgmt_infra_ip: "{{ global_os_mgmt_network }}.{{ global_infra_node_suffix }}"
+global_os_mgmt_installer_ip: "{{ global_os_mgmt_network }}.{{ global_installer_node_suffix }}"
+global_os_mgmt_compute1_ip: "{{ global_os_mgmt_network }}.{{ global_compute1_node_suffix }}"
+global_os_mgmt_compute2_ip: "{{ global_os_mgmt_network }}.{{ global_compute2_node_suffix }}"
+global_os_mgmt_storage_ip: "{{ global_os_mgmt_network }}.{{ global_storage_node_suffix }}"
+global_os_mgmt_used_ips: "{{ global_os_mgmt_network }}.50,{{ global_os_mgmt_network }}.110"
+
+global_os_lb_external_vip: "{{ global_os_mgmt_network }}.100"
+global_os_lb_internal_vip: "{{ global_os_mgmt_network }}.101"
+
+global_os_tunnel_network_name: tunnel
+global_os_tunnel_network_bridge: br-vxlan
+global_os_tunnel_network: 172.29.248
+global_os_tunnel_subnet: "{{ global_os_tunnel_network }}.0/{{ global_os_prefix }}"
+global_os_tunnel_gw: "{{ global_os_tunnel_network }}.1"
+global_os_tunnel_used_ips: "{{ global_os_tunnel_network }}.70,{{ global_os_tunnel_network }}.90"
+
+global_os_storage_network_name: storage
+global_os_storage_network_bridge: br-storage
+global_os_storage_network: 172.29.244
+global_os_storage_subnet: "{{ global_os_storage_network }}.0/{{ global_os_prefix }}"
+global_os_storage_gw: "{{ global_os_storage_network }}.1"
+global_os_storage_used_ips: "{{ global_os_storage_network }}.70,{{ global_os_storage_network }}.90"
+
+global_os_lbaas_network_name: lbaas
+global_os_lbaas_network_bridge: br-lbaas
+global_os_lbaas_network: 172.29.232
+global_os_lbaas_network_end: 172.29.235
+global_os_lbaas_subnet: "{{ global_os_lbaas_network }}.0/{{ global_os_prefix }}"
+global_os_lbaas_gw: "{{ global_os_lbaas_network }}.1"
+global_os_lbaas_used_ips: "{{ global_os_lbaas_network }}.70,{{ global_os_lbaas_network }}.200"
+global_os_lbaas_subnet_range: "{{ global_os_lbaas_network }}.10-{{ global_os_lbaas_network_end }}.250"
+
+

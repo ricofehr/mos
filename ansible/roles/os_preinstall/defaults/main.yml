@@ -1,0 +1,52 @@
+---
+
+os_preinstall_firstboot_creates_path: ~/.first_try
+os_preinstall_logs_folder: "{{ ansible_env.HOME }}/logs"
+
+os_preinstall_vlan_network_name: vlan
+os_preinstall_vlan_network_name_flat: flat
+os_preinstall_vlan_network_bridge: br-vlan
+
+os_preinstall_mgmt_network_name: mgmt
+os_preinstall_mgmt_network_bridge: br-mgmt
+os_preinstall_mgmt_subnet: 192.168.10.0/24
+
+os_preinstall_mgmt_infra_ip: "{{ os_preinstall_mgmt_network }}.170"
+os_preinstall_mgmt_compute1_ip: "{{ os_preinstall_mgmt_network }}.175"
+os_preinstall_mgmt_compute2_ip: "{{ os_preinstall_mgmt_network }}.176"
+os_preinstall_mgmt_storage_ip: "{{ os_preinstall_mgmt_network }}.180"
+
+os_preinstall_tunnel_network_name: tunnel
+os_preinstall_tunnel_network_name_flat: flat
+os_preinstall_tunnel_network_bridge: bt-tunnel
+os_preinstall_tunnel_subnet: 192.168.11.0/24
+
+os_preinstall_storage_network_name: storage
+os_preinstall_storage_network_bridge: br-storage
+os_preinstall_storage_subnet: 192.168.12.0/24
+os_preinstall_storage_vg: "storage"
+
+os_preinstall_lbaas_network_name: lbaas
+os_preinstall_lbaas_network_bridge: br-lbaas
+os_preinstall_lbaas_subnet: 192.168.13.0/24
+
+os_preinstall_octavia_allocation_pool: "192.168.13.150-192.168.13.250"
+os_preinstall_octavia_vlan_id: 350
+
+os_preinstall_used_ips:
+  - "192.168.11.1"
+  - "192.168.12.1"
+  - "192.168.13.1"
+  - "192.168.14.1"
+  - "192.168.11.70,192.168.11.200"
+  - "192.168.12.70,192.168.12.200"
+  - "192.168.13.70,192.168.13.200"
+  - "192.168.14.70,192.168.14.200"
+  
+os_preinstall_external_lb_vip: "192.168.11.100"
+os_preinstall_internal_lb_vip: "192.168.11.101"
+
+os_preinstall_admin_password: toor
+os_preinstall_osa_version: 22.0.1
+os_preinstall_nova_cpus_ratio: 4.0
+os_preinstall_nova_virt_type: kvm
