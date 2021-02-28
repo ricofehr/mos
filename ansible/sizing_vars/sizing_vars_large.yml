@@ -1,0 +1,53 @@
+---
+
+sizing_infra_nodes:
+  - name: infra1
+    suffix: 70
+
+sizing_compute_nodes:
+  - name: compute1
+    suffix: 75
+  - name: compute2
+    suffix: 76
+
+sizing_storage_nodes:
+  - name: storage1
+    suffix: 80
+
+sizing_os_nova_cpus_ratio: 10.0
+
+sizing_os_flavors:
+  - name: small
+    cpus: 1
+    ram: 1024
+    disk: 20
+  - name: medium
+    cpus: 2
+    ram: 2048
+    disk: 30
+  - name: xmedium
+    cpus: 2
+    ram: 4096
+    disk: 30
+  - name: large
+    cpus: 4
+    ram: 6144
+    disk: 40
+  - name: xlarge
+    cpus: 6
+    ram: 8192
+    disk: 50
+
+sizing_os_quotas:
+  instances: 40
+  keypairs: 20
+  cores: 160
+  ram: 72704
+  servergroups: 40
+  diskspace: 550
+  volumes: 60
+  snapshots: 60
+  floatingips: 80
+
+sizing_k8s_deploy_sizing: large
+

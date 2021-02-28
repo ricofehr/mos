@@ -6,13 +6,15 @@ network_config_eth1_vlan_2: "{{ global_eth1_vlan_2 }}"
 network_config_eth2_vlan_1: "{{ global_eth2_vlan_1 }}"
 network_config_eth2_vlan_2: "{{ global_eth2_vlan_2 }}"
 
-network_config_brmgmt_address: "{{ global_os_mgmt_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
+network_config_brmgmt_ip: "{{ global_os_mgmt_network }}.{{ network_config_ip_id }}"
+network_config_brmgmt_address: "{{ network_config_brmgmt_ip }}/{{ global_os_prefix }}"
 network_config_brmgmt_gw_address: "{{ global_os_mgmt_gw }}/{{ global_os_prefix }}"
 network_config_brvxlan_address: "{{ global_os_tunnel_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
 network_config_brstorage_address: "{{ global_os_storage_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
 network_config_brlbaas_address: "{{ global_os_lbaas_gw }}/{{ global_os_prefix }}"
+network_config_lbaas_subnet: "{{ global_os_lbaas_subnet }}"
 network_config_publicos_address: "{{ global_os_public_gw }}/{{ global_os_public_network_prefix }}"
-network_config_publicos_subnet: "{{ global_os_public_network }}.0/{{ global_os_public_network_prefix }}"
+network_config_publicos_subnet: "{{ global_os_public_subnet }}"
 network_config_internal_vip_address: "{{ global_os_lb_internal_vip }}/{{ global_os_prefix }}"
 network_config_external_vip_address: "{{ global_os_lb_external_vip }}/{{ global_os_prefix }}"
 
@@ -69,7 +71,8 @@ network_config_block: |
       offload-sg off
       address {{ network_config_brlbaas_address }}
       post-up /usr/local/bin/configure_br-lbaas_veth.sh
- 
+      post-up iptables -t nat -A POSTROUTING -s {{ network_config_lbaas_subnet }} ! -d {{ network_config_lbaas_subnet }} -j MASQUERADE
+
   auto br-vxlan
   iface br-vxlan inet static
       bridge_stp off

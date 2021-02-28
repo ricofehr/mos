@@ -12,6 +12,7 @@
   get_url:
     url: "{{ k8s_deploy_tf_download_url }}" 
     dest: /tmp/terraform.zip
+    mode: 0644
 
 - name: Install terraform
   shell: |
@@ -70,9 +71,10 @@
 
 - name: Deploy k8s
   shell: |
-    ./deployos -o {{ k8s_deploy_ubuntu_os_img }} -snet {{ k8s_deploy_os_private_network_id }} -fip {{ k8s_deploy_os_public_network_id }} -oscrt {{ k8s_deploy_haproxy_ssl_crt_path }} -w ~/.local/bin/ansible-playbook >{{ k8s_deploy_logs_folder}}/log_k8s_$(date +%s) 2>&1
+    ./deployos -o {{ k8s_deploy_ubuntu_os_img }} -s {{ k8s_deploy_sizing }} -snet {{ k8s_deploy_os_private_network_id }} -fip {{ k8s_deploy_os_public_network_id }} -oscrt {{ k8s_deploy_haproxy_ssl_crt_path }} -w ~/.local/bin/ansible-playbook >{{ k8s_deploy_logs_folder}}/log_k8s_$(date +%s) 2>&1
   args:
     chdir: ~/k8s
     executable: /bin/bash
     creates: "{{ k8s_deploy_firstboot_creates_path }}"
+  when: k8s_deploy == "1"
 

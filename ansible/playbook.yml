@@ -7,6 +7,8 @@
 
 - hosts: all 
   strategy: linear
+  vars_files:
+    - sizing_vars.yml
   roles:
     - role: base
       tags: [prerequisites, base]
@@ -23,6 +25,8 @@
     - infras
     - computes
   strategy: linear
+  vars_files:
+    - sizing_vars.yml
   roles:
     - role: disk
       tags: [prerequisites, disk]
@@ -30,6 +34,8 @@
 - hosts:
     - storages
   strategy: linear
+  vars_files:
+    - sizing_vars.yml
   roles:
     - role: lvm
       tags: [prerequisites, lvm]
@@ -38,6 +44,8 @@
     - computes
     - storages
   strategy: linear
+  vars_files:
+    - sizing_vars.yml
   roles:
     - role: end
       tags: [prerequisites]
@@ -45,6 +53,8 @@
 - hosts: installer
   serial: 1
   strategy: linear
+  vars_files:
+    - sizing_vars.yml
   roles:
     - role: os_preinstall
       tags: [os, os_preinstall]
@@ -54,6 +64,8 @@
 - hosts: infras
   serial: 1
   strategy: linear
+  vars_files:
+    - sizing_vars.yml
   roles:
     - role: os_postinstall
       tags: [os, postinstall, os_postinstall]
@@ -63,9 +75,10 @@
 - hosts: installer
   serial: 1
   strategy: linear
+  vars_files:
+    - sizing_vars.yml
   roles:
     - role: k8s_deploy
-      when: global_k8s_deploy == "1"
       tags: [postinstall, k8s_deploy]
     - role: end
       tags: [postinstall]

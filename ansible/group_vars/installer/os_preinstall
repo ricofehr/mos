@@ -3,15 +3,16 @@
 os_preinstall_firstboot_creates_path: "{{ global_all_firstboot_creates_path }}"
 os_preinstall_logs_folder: "{{ ansible_env.HOME }}/logs"
 
+os_preinstall_dns_servers: "{{ global_os_dns_servers }}"
+os_preinstall_infra_nodes: "{{ global_infra_nodes }}"
+os_preinstall_compute_nodes: "{{ global_compute_nodes }}"
+os_preinstall_storage_nodes: "{{ global_storage_nodes }}"
+
+os_preinstall_mgmt_network: "{{ global_os_mgmt_network }}"
 os_preinstall_mgmt_network_name: "{{ global_os_mgmt_network_name }}"
 os_preinstall_mgmt_network_bridge: "{{ global_os_mgmt_network_bridge }}"
 os_preinstall_mgmt_subnet: "{{ global_os_mgmt_subnet }}"
 os_preinstall_mgmt_gw: "{{ global_os_mgmt_gw }}"
-os_preinstall_mgmt_infra_ip: "{{ global_os_mgmt_infra_ip }}"
-os_preinstall_mgmt_installer_ip: "{{ global_os_mgmt_installer_ip }}"
-os_preinstall_mgmt_compute1_ip: "{{ global_os_mgmt_compute1_ip }}"
-os_preinstall_mgmt_compute2_ip: "{{ global_os_mgmt_compute2_ip }}"
-os_preinstall_mgmt_storage_ip: "{{ global_os_mgmt_storage_ip }}"
 os_preinstall_mgmt_used_ips: "{{ global_os_mgmt_used_ips }}"
 
 os_preinstall_tunnel_network_name: "{{ global_os_tunnel_network_name }}"
@@ -41,10 +42,13 @@ os_preinstall_vlan_network_name_flat: "{{ global_os_vlan_network_name_flat }}"
 
 os_preinstall_used_ips:
   - "{{ os_preinstall_mgmt_gw }}"
-  - "{{ os_preinstall_mgmt_installer_ip }}"
   - "{{ os_preinstall_mgmt_used_ips }}"
   - "{{ os_preinstall_tunnel_gw }}"
   - "{{ os_preinstall_tunnel_used_ips }}"
+  - "{{ os_preinstall_storage_gw }}"
+  - "{{ os_preinstall_storage_used_ips }}"
+  - "{{ os_preinstall_lbaas_gw }}"
+  - "{{ os_preinstall_lbaas_used_ips }}"
 
 os_preinstall_external_lb_vip: "{{ global_os_lb_external_vip }}"
 os_preinstall_internal_lb_vip: "{{ global_os_lb_internal_vip }}"

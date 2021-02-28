@@ -1,3 +1,5 @@
+---
+
 - name: Init utility container name
   shell: ls /var/lib/lxc/ | grep utility | tr -d "\n"
   register: utility_container
@@ -15,8 +17,8 @@
     openstack role add --user {{ os_postinstall_user }} --project {{ os_postinstall_project }} load-balancer_member &&
     openstack network create --share --project {{ os_postinstall_mgmt_project }} --external --provider-network-type flat --provider-physical-network flat {{ os_postinstall_public_name }} &&
     openstack network create --share --project {{ os_postinstall_project }} --provider-network-type vxlan {{ os_postinstall_private_name }} &&
-    openstack subnet create --project {{ os_postinstall_mgmt_project }} --subnet-range {{ os_postinstall_public_subnet }} --no-dhcp --gateway {{ os_postinstall_public_gw }} --dns-nameserver {{ os_postinstall_dns_server }} --network {{ os_postinstall_public_name }} --ip-version 4 --allocation-pool {{ os_postinstall_public_allocation_pool }} {{ os_postinstall_public_subnet }} &&
-    openstack subnet create --project {{ os_postinstall_project }} --subnet-range {{ os_postinstall_private_subnet }} --dhcp --dns-nameserver {{ os_postinstall_dns_server }} --network {{ os_postinstall_private_name }} --ip-version 4 {{ os_postinstall_private_subnet }} &&
+    openstack subnet create --project {{ os_postinstall_mgmt_project }} --subnet-range {{ os_postinstall_public_subnet }} --no-dhcp --gateway {{ os_postinstall_public_gw }} --network {{ os_postinstall_public_name }} --ip-version 4 --allocation-pool {{ os_postinstall_public_allocation_pool }} {{ os_postinstall_public_subnet }} &&
+    openstack subnet create --project {{ os_postinstall_project }} --subnet-range {{ os_postinstall_private_subnet }} --dhcp --network {{ os_postinstall_private_name }} --ip-version 4 {{ os_postinstall_private_subnet }} &&
     openstack router create --no-ha --project {{ os_postinstall_project }} {{ os_postinstall_router_name }} &&
     openstack router add subnet {{ os_postinstall_router_name }} {{ os_postinstall_private_subnet }} &&
     openstack router set {{ os_postinstall_router_name }} --external-gateway {{ os_postinstall_public_name }}"
@@ -104,6 +106,7 @@
     openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 8001 --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
     openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 30000:40000 --remote-ip {{ os_postinstall_private_subnet }} {{ os_postinstall_k8s_os_secgrp }} &&
     openstack security group rule create --project {{ os_postinstall_project }} --protocol icmp --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
+    openstack security group rule create --project {{ os_postinstall_project }} --protocol udp --remote-group {{ os_postinstall_k8s_os_secgrp }} {{ os_postinstall_k8s_os_secgrp }} &&
     openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --remote-group {{ os_postinstall_k8s_os_secgrp }} {{ os_postinstall_k8s_os_secgrp }}"
   args:
     executable: /bin/bash

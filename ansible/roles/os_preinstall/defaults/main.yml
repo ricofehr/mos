@@ -7,14 +7,22 @@ os_preinstall_vlan_network_name: vlan
 os_preinstall_vlan_network_name_flat: flat
 os_preinstall_vlan_network_bridge: br-vlan
 
+os_preinstall_mgmt_network: 192.168.10
 os_preinstall_mgmt_network_name: mgmt
 os_preinstall_mgmt_network_bridge: br-mgmt
-os_preinstall_mgmt_subnet: 192.168.10.0/24
+os_preinstall_mgmt_subnet: "{{ os_preinstall_mgmt_network }}.0/24"
 
-os_preinstall_mgmt_infra_ip: "{{ os_preinstall_mgmt_network }}.170"
-os_preinstall_mgmt_compute1_ip: "{{ os_preinstall_mgmt_network }}.175"
-os_preinstall_mgmt_compute2_ip: "{{ os_preinstall_mgmt_network }}.176"
-os_preinstall_mgmt_storage_ip: "{{ os_preinstall_mgmt_network }}.180"
+os_preinstall_mgmt_infra_nodes:
+  - name: infra1
+    suffix: 170
+
+os_preinstall_mgmt_compute_nodes:
+  - name: compute1
+    suffix: 175
+
+os_preinstall_mgmt_storage_nodes:
+  - name: storage1
+    suffix: 176
 
 os_preinstall_tunnel_network_name: tunnel
 os_preinstall_tunnel_network_name_flat: flat
@@ -46,6 +54,7 @@ os_preinstall_used_ips:
 os_preinstall_external_lb_vip: "192.168.11.100"
 os_preinstall_internal_lb_vip: "192.168.11.101"
 
+os_preinstall_dns_servers: "8.8.8.8,8.8.4.4"
 os_preinstall_admin_password: toor
 os_preinstall_osa_version: 22.0.1
 os_preinstall_nova_cpus_ratio: 4.0

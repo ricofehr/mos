@@ -67,13 +67,12 @@
     mode: 644
   become: yes
 
-- name: "Ensure infra1 is resolved into hosts file"
+- name: "Ensure infra nodes are resolved into hosts file"
   lineinfile:
     dest: /etc/hosts
-    line: "{{ os_preinstall_mgmt_infra_ip }} infra1"
+    line: "{{ os_preinstall_mgmt_network }}.{{ item.suffix }} {{ item.name }}"
     state: present
-  with_items: "{{ ansible_play_hosts }}"
-  when: hostvars[inventory_hostname]['ansible_host'] is defined
+  loop: "{{ os_preinstall_infra_nodes }}" 
   become: yes
 
 

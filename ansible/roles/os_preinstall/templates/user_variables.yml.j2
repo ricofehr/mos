@@ -20,6 +20,8 @@ nova_user_pip_packages:
 nova_cpu_allocation_ratio: {{ os_preinstall_nova_cpus_ratio }}
 nova_virt_type: {{ os_preinstall_nova_virt_type }}
 
+neutron_dnsmasq_noresolv: True
+neutron_dnsmasq_dns_servers: {{ os_preinstall_dns_servers }}
 neutron_plugin_base:
    - router
 

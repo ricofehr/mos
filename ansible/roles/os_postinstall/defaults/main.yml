@@ -4,7 +4,6 @@ os_postinstall_firstboot_creates_path: ~/.first_try
 os_postinstall_project: project
 os_postinstall_user: user
 os_postinstall_password: pass1234
-os_postinstall_dns_server: 8.8.8.8
 os_postinstall_mgmt_project: service
 os_postinstall_router_name: router
 os_postinstall_public_name: public
@@ -35,6 +34,6 @@ os_postinstall_images:
   - name: focal
     url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
 
-os_postinstall_k8s_deploy: 0
+os_postinstall_k8s_deploy: "0"
 os_postinstall_k8s_os_secgrp: k8s
 

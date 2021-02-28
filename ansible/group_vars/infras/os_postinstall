@@ -6,7 +6,6 @@ os_postinstall_project: "{{ global_os_project }}"
 os_postinstall_user: "{{ global_os_user }}"
 os_postinstall_password: "{{ global_os_password }}"
 
-os_postinstall_dns_server: "{{ global_os_dns_server }}"
 os_postinstall_mgmt_project: service
 os_postinstall_router_name: "{{ global_os_router_name }}"
 os_postinstall_public_name: "{{ global_os_public_network_name }}"
