@@ -1,14 +1,14 @@
 # os-ansible-poc
 
-Openstack (victoria release) installation with Vagrant : 1 controller/neutron, 1 cinder, 2 nova computes, with use of openstack-ansible project.
-Optionnaly, deploy on openstack a k8s (v1.20) on 6 vms : 1 master and 5 nodes.
+Openstack (victoria release) installation with Vagrant : 1 controller/neutron, 1 cinder, 1 or 2 nova computes, with use of openstack-ansible project.
+Optionnaly, deploy on openstack a k8s (v1.20) on 3 to 6 vms : 1 master and 2 to 5 nodes.
 
 ## Requirements
 
-Ensure you have enough system resources
-- 6 CPU Cores
-- 64 Go RAM
-- At least 200Go free disk space
+Ensure you have enough system resources, at least for a small deployment
+- 4 CPU Cores
+- 32 Go RAM
+- At least 300Go free disk space
 
 For setup execution, you need following packages/softwares on your workstation
 - An hypervisor : virtualbox or kvm (with libvirtd)
@@ -43,8 +43,13 @@ Execute ./up cmd with optional following options
 Usage: ./up [options]
 -h           this is some help text.
 -d           destroy all previously openstack install
--p xxxx      vagrant provider virtualbox / libvirt, default is virtualbox
--k           deploy k8s onto 6 vms (1 master and 5 nodes) after openstack install
+-k           deploy k8s onto 6 vms (1 master and 5 nodes) after openstack install ending
+-p xxxx      vagrant provider, default is virtualbox
+-s xxxx      sizing deployment, default is small
+              - small : host with 32Go ram / 4 cores / 300Go free disk space
+              - medium : host with 64Go ram / 6 cores / 600Go free disk space
+              - large : host with 96Go ram / 8 cores / 1000Go free disk space
+              - xlarge : host with 128Go ram / 12 cores / 1500Go free disk space
 ```
 
 ## PostInstall Instructions
@@ -66,11 +71,11 @@ https://172.29.36.100/ (tenant0 / tenant0 and admin / toor)
 
 ## K8S Deployment
 
-You can deploy a k8s during setup with '-k' parameter on ./up command
+You can deploy a k8s during setup with '-k' parameter on ./up command (sizing small by default)
 ```
 ./up -k
 ```
-Kubernetes deployment will launch 6 vms : 1 master and 5 nodes, and use vagrant public ssh key as openstack keypair (!! not secure).
+Kubernetes deployment will launch multiple vms : 1 master and 2 (small) to 5 (large) nodes, and use vagrant public ssh key as openstack keypair (!! not secure).
 
 This deployment uses this k8s install repository: https://github.com/ricofehr/k8s
 
