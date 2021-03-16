@@ -13,7 +13,7 @@ global_k8s_repo_release: "v0.2"
 global_k8s_ubuntu_os_img: "focal"
 global_k8s_os_secgrp: "k8s"
 
-global_os_osa_version: "22.0.1"
+global_os_osa_version: "22.1.0"
 
 global_os_dns_servers: "8.8.8.8,8.8.4.4"
 global_os_region: "RegionOne"
