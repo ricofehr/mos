@@ -56,6 +56,6 @@ os_preinstall_internal_lb_vip: "192.168.11.101"
 
 os_preinstall_dns_servers: "8.8.8.8,8.8.4.4"
 os_preinstall_admin_password: toor
-os_preinstall_osa_version: 22.0.1
+os_preinstall_osa_version: 22.3.2
 os_preinstall_nova_cpus_ratio: 4.0
 os_preinstall_nova_virt_type: kvm

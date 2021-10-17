@@ -17,7 +17,7 @@
 
 - name: clone openstack-ansible repo
   git:
-    repo: https://git.openstack.org/openstack/openstack-ansible
+    repo: "{{ os_preinstall_osa_repository }}"
     version: "{{ os_preinstall_osa_version }}"
     dest: /opt/openstack-ansible
   become: yes

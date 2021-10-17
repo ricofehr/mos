@@ -12,6 +12,8 @@
   roles:
     - role: base
       tags: [prerequisites, base]
+    - role: ntp
+      tags: [prerequisites, base]
     - role: osa_sshkeys
       tags: [prerequisites, osa_sshkeys]
     - role: swapoff

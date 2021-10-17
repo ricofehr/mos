@@ -1,0 +1,8 @@
+---
+
+- name: Restart ntpd
+  service:
+    name: ntp
+    state: restarted
+  become: yes
+

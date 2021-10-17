@@ -1,0 +1,10 @@
+---
+
+- name: Configure ntp
+  template:
+    src: templates/ntp.conf.j2
+    dest: /etc/ntp.conf
+    mode: 0644
+  notify: Restart ntpd
+  become: yes
+

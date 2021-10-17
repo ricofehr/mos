@@ -9,3 +9,5 @@ os_preinstall_cidr_networks:
     network: "{{ os_preinstall_storage_subnet }}"
   - name: "{{ os_preinstall_lbaas_network_name }}"
     network: "{{ os_preinstall_lbaas_subnet }}"
+ 
+os_preinstall_osa_repository: "https://opendev.org/openstack/openstack-ansible"
