@@ -27,7 +27,6 @@ Vagrant.configure("2") do |config|
       virthost.cpus = 2
       virthost.driver = "kvm"
       virthost.disk_bus = "scsi"
-      #virthost.disk_driver_opts :cache => "writeback", :io => "native", :discard => "unmap"
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
@@ -54,7 +53,7 @@ Vagrant.configure("2") do |config|
       virthost.customize ["modifyvm", :id, "--nicpromisc3", "allow-vms"]
 
       # RAM / CPU
-      virthost.memory = 16384
+      virthost.memory = 24576
       virthost.cpus = 4
 
       # lxc containers filesystem
@@ -66,12 +65,11 @@ Vagrant.configure("2") do |config|
      end
 
     uosc.vm.provider :libvirt do |virthost|
-      virthost.memory = 16384
+      virthost.memory = 24576
       virthost.cpus = 4
       virthost.driver = "kvm"
       virthost.disk_bus = "scsi"
-      #virthost.disk_driver_opts :cache => "writeback", :io => "native", :discard => "unmap"
-      virthost.storage :file, size: "150G", type: "qcow2", path: "disk_lxc.img", bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+      virthost.storage :file, size: "150G", type: "qcow2", path: "disk_lxc.img", bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
@@ -125,8 +123,7 @@ Vagrant.configure("2") do |config|
         virthost.cpu_mode = "host-model"
         virthost.cpu_feature :name => "vmx", :policy => "require"
         virthost.disk_bus = "scsi"
-        #virthost.disk_driver_opts :cache => "writeback", :io => "native", :discard => "unmap"
-        virthost.storage :file, size: "300G", type: "qcow2", path: "disk_#{name}.img", bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+        virthost.storage :file, size: "300G", type: "qcow2", path: "disk_#{name}.img", bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
       end
   
       # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
@@ -170,8 +167,7 @@ Vagrant.configure("2") do |config|
       virthost.cpus = 2
       virthost.driver = "kvm"
       virthost.disk_bus = "scsi"
-      #virthost.disk_driver_opts :cache => "writeback", :io => "native", :discard => "unmap"
-      virthost.storage :file, size: "300G", type: "qcow2", path: "disk_cinder.img", bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+      virthost.storage :file, size: "300G", type: "qcow2", path: "disk_cinder.img", bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...

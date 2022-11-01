@@ -136,7 +136,7 @@
   become: yes
 
 - name: Get haproxy ssl cert
-  shell: cat /etc/ssl/certs/haproxy.cert
+  shell: cat /etc/haproxy/ssl/haproxy_infra1-172.29.236.100.pem
   register: k8s_deploy_haproxy_ssl_crt
   when: os_postinstall_k8s_deploy == "1"
   become: yes

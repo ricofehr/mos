@@ -69,9 +69,18 @@
     version: "{{ k8s_deploy_version }}"
     dest: ~/k8s
 
+- name: Debug k8s deploy cmd
+  shell: |
+    echo "./deploy-to-openstack -o {{ k8s_deploy_ubuntu_os_img }} -s {{ k8s_deploy_sizing }} -snet {{ k8s_deploy_os_private_network_id }} -fip {{ k8s_deploy_os_public_network_id }} -oscrt {{ k8s_deploy_haproxy_ssl_crt_path }} -w ~/.local/bin/ansible-playbook" >{{ k8s_deploy_logs_folder}}/deploy_k8s_cmd_$(date +%s) 2>&1
+  args:
+    chdir: ~/k8s
+    executable: /bin/bash
+    creates: "{{ k8s_deploy_firstboot_creates_path }}"
+  when: k8s_deploy == "1"
+
 - name: Deploy k8s
   shell: |
-    ./deployos -o {{ k8s_deploy_ubuntu_os_img }} -s {{ k8s_deploy_sizing }} -snet {{ k8s_deploy_os_private_network_id }} -fip {{ k8s_deploy_os_public_network_id }} -oscrt {{ k8s_deploy_haproxy_ssl_crt_path }} -w ~/.local/bin/ansible-playbook >{{ k8s_deploy_logs_folder}}/log_k8s_$(date +%s) 2>&1
+    ./deploy-to-openstack -o {{ k8s_deploy_ubuntu_os_img }} -s {{ k8s_deploy_sizing }} -snet {{ k8s_deploy_os_private_network_id }} -fip {{ k8s_deploy_os_public_network_id }} -oscrt {{ k8s_deploy_haproxy_ssl_crt_path }} -w ~/.local/bin/ansible-playbook >{{ k8s_deploy_logs_folder}}/log_k8s_$(date +%s) 2>&1
   args:
     chdir: ~/k8s
     executable: /bin/bash
