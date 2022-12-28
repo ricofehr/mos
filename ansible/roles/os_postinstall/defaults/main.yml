@@ -31,6 +31,8 @@ os_postinstall_quotas:
   floatingips: 100
 
 os_postinstall_images:
+  - name: jammy
+    url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
   - name: focal
     url: https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
 
