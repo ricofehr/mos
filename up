@@ -67,14 +67,14 @@ fi
 
 # Create vdi disk folder
 if [[ "$PROVIDER" = "virtualbox" ]]; then
-  LIBVIRTDRIVER="qemu"
+  #LIBVIRTDRIVER="qemu"
   sudo mkdir -p /usr/local/datas/os
   sudo chmod 777 /usr/local/datas/os
 fi
 
 # Launch vagrant vms
 ln -sf vagrantfiles/Vagrantfile_${SIZING} Vagrantfile
-vagrant up --provider=$PROVIDER
+VAGRANT_EXPERIMENTAL="disks" vagrant up --provider=$PROVIDER
 sleep 10
 
 # Disable cowsay ansible output

@@ -23,7 +23,6 @@
     chdir: /tmp
     executable: /bin/bash
     creates: "{{ k8s_deploy_firstboot_creates_path }}"
-    warn: no
   become: yes
 
 - name: OS crt folder
@@ -49,7 +48,6 @@
   args:
     executable: /bin/bash
     creates: "{{ k8s_deploy_firstboot_creates_path }}"
-    warn: no
 
 - name: Pip3 install
   apt:

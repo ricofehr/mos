@@ -22,8 +22,10 @@ nova_virt_type: {{ os_preinstall_nova_virt_type }}
 
 neutron_dnsmasq_noresolv: True
 neutron_dnsmasq_dns_servers: {{ os_preinstall_dns_servers }}
+neutron_plugin_type: 'ml2.lxb'
 neutron_plugin_base:
    - router
+neutron_ml2_drivers_type: "flat,vlan,vxlan,local"
 
 octavia_management_net_subnet_allocation_pools: "{{ os_preinstall_octavia_allocation_pool }}"
 octavia_management_net_subnet_cidr: {{ os_preinstall_lbaas_subnet }}
@@ -33,3 +35,7 @@ octavia_container_network_name: {{ os_preinstall_lbaas_network_name }}_address
 octavia_provider_network_name: vlan
 octavia_provider_network_type: vlan
 octavia_provider_segmentation_id: {{ os_preinstall_octavia_vlan_id }}
+octavia_loadbalancer_topology: SINGLE
+octavia_enable_anti_affinity: False
+octavia_provider_inventory_net_name: lbaas
+
