@@ -17,14 +17,32 @@ Vagrant.configure("2") do |config|
     uosi.vm.provider :libvirt do |virthost|
       virthost.memory = 2048
       virthost.cpus = 1
-      virthost.driver = 'kvm'
-      virthost.disk_bus = 'scsi'
+      virthost.driver = "kvm"
+      virthost.disk_bus = "scsi"
+    end
+
+    uosi.vm.provider :vmware_desktop do |virthost|
+      virthost.vmx["memsize"] = "2048"
+      virthost.vmx["numvcpus"] = "1"
+      virthost.vmx["disk.EnableUUID"] = "TRUE"
+      virthost.vmx["ethernet0.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.connectionType"] = "hostonly"
+      virthost.vmx["ethernet1.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.noPromisc"] = "TRUE"
+      virthost.vmx["ethernet2.connectionType"] = "custom"
+      virthost.vmx["ethernet2.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet2.noPromisc"] = "TRUE"
+    end
+
+    uosi.vm.provider :parallels do |virthost|
+      virthost.memory = 2048
+      virthost.cpus = 2
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
-    uosi.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.50", netmask: "255.255.255.128", virtualbox__intnet: "os_mgmt"
+    uosi.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.50", netmask: "255.255.255.0", virtualbox__intnet: "os_mgmt", type: "static"
     # Default input ip, used mainly for ansible reachablity
-    uosi.vm.network :private_network, ip: "192.168.95.50", netmask: "255.255.255.128"
+    uosi.vm.network :private_network, ip: "192.168.95.50", netmask: "255.255.255.0", type: "static"
   end
 
   config.vm.define :infra1 do |uosc|
@@ -52,17 +70,39 @@ Vagrant.configure("2") do |config|
     uosc.vm.provider :libvirt do |virthost|
       virthost.memory = 16384
       virthost.cpus = 2
-      virthost.driver = 'kvm'
-      virthost.disk_bus = 'scsi'
-      virthost.storage :file, size: '100G', type: 'qcow2', path: 'disk_infra1.img', bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
+      virthost.driver = "kvm"
+      virthost.disk_bus = "scsi"
+      virthost.storage :file, size: "100G", type: "qcow2", path: "disk_infra1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
+    end
+
+    uosc.vm.provider :vmware_desktop do |virthost|
+      virthost.vmx["memsize"] = "16384"
+      virthost.vmx["numvcpus"] = "2"
+      virthost.vmx["disk.EnableUUID"] = "TRUE"
+      virthost.vmx["ethernet0.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.connectiontype"] = "hostonly"
+      virthost.vmx["ethernet1.noPromisc"] = "FALSE"
+      virthost.vmx["ethernet1.virtualdev"] = "vmxnet3"
+      virthost.vmx["ethernet2.connectionType"] = "hostonly"
+      virthost.vmx["ethernet2.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet2.noPromisc"] = "TRUE"
+      virthost.vmx["ethernet3.connectionType"] = "custom"
+      virthost.vmx["ethernet3.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet3.noPromisc"] = "TRUE"
+    end
+
+    uosc.vm.provider :parallels do |virthost|
+      virthost.memory = 16384
+      virthost.cpus = 2
+      virthost.customize ["set", :id, "--device-add", "hdd", "--size", "100000", "--iface", "sata"]
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
-    uosc.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.70", netmask: "255.255.255.128", virtualbox__intnet: "os_mgmt"
+    uosc.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.70", netmask: "255.255.255.0", virtualbox__intnet: "os_mgmt"
     # Neutron network vlan for openstack network stacks management
-    uosc.vm.network :private_network, libvirt__network_name: "os_net", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.85.70", netmask: "255.255.255.128", virtualbox__intnet: "os_net", auto_config: false
+    uosc.vm.network :private_network, libvirt__network_name: "os_net", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.85.70", netmask: "255.255.255.0", virtualbox__intnet: "os_net", auto_config: false
     # Default input ip, used mainly for ansible reachablity
-    uosc.vm.network :private_network, ip: "192.168.95.70", netmask: "255.255.255.128"
+    uosc.vm.network :private_network, ip: "192.168.95.70", netmask: "255.255.255.0"
   end
 
   config.vm.define :compute1 do |uosnv|
@@ -96,19 +136,52 @@ Vagrant.configure("2") do |config|
       virthost.memory = 43008
       virthost.cpus = 8
       virthost.nested = true
-      virthost.driver = 'kvm'
+      virthost.driver = "kvm"
       virthost.cpu_mode = "host-passthrough"
-      virthost.disk_bus = 'scsi'
-      virthost.storage :file, size: '300G', type: 'qcow2', path: 'disk_compute1.img', bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
+      virthost.disk_bus = "scsi"
+      virthost.storage :file, size: "300G", type: "qcow2", path: "disk_compute1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
+    end
+
+    uosnv.vm.provider :vmware_desktop do |virthost|
+      virthost.vmx["memsize"] = "43008"
+      virthost.vmx["numvcpus"] = "8"
+      virthost.vmx["disk.EnableUUID"] = "TRUE"
+      virthost.vmx["vmx.allowNested"] = "TRUE"
+      virthost.vmx["cpuid.enable_vmx"] = "TRUE"
+      virthost.vmx["cpuid.supportsMulticore"] = "TRUE"
+      virthost.vmx["vhv.enable"] = "TRUE"
+      virthost.vmx["virtualHW.version"] = "19"
+      virthost.vmx["monitor_control.enable_paravirt"] = "TRUE"
+      virthost.vmx["monitor_control.disableNMI"] = "FALSE"
+      virthost.vmx["monitor.virtual_mmu"] = "hardware"
+      virthost.vmx["monitor.virtual_exec"] = "hardware"
+      virthost.vmx["numa.nodeAffinity"] = "TRUE"
+      virthost.vmx["ethernet0.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.connectiontype"] = "hostonly"
+      virthost.vmx["ethernet1.noPromisc"] = "TRUE"
+      virthost.vmx["ethernet1.virtualdev"] = "vmxnet3"
+      virthost.vmx["ethernet2.connectionType"] = "hostonly"
+      virthost.vmx["ethernet2.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet2.noPromisc"] = "TRUE"
+      virthost.vmx["ethernet3.connectionType"] = "custom"
+      virthost.vmx["ethernet3.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet3.noPromisc"] = "TRUE"
+    end
+
+    uosnv.vm.provider :parallels do |virthost|
+      virthost.memory = 43008
+      virthost.cpus = 8
+      virthost.customize ["set", :id, "--nested-virt", "on"]
+      virthost.customize ["set", :id, "--device-add", "hdd", "--size", "300000", "--iface", "sata"]
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
-    uosnv.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.75", netmask: "255.255.255.128", virtualbox__intnet: "os_mgmt"
+    uosnv.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.75", netmask: "255.255.255.0", virtualbox__intnet: "os_mgmt"
     # Neutron network vlan for openstack network stacks management
-    uosnv.vm.network :private_network, libvirt__network_name: "os_net", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.85.75", netmask: "255.255.255.128", virtualbox__intnet: "os_net", auto_config: false
+    uosnv.vm.network :private_network, libvirt__network_name: "os_net", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.85.75", netmask: "255.255.255.0", virtualbox__intnet: "os_net", auto_config: false
 
     # Default input ip, used mainly for ansible reachablity
-    uosnv.vm.network :private_network, :ip => "192.168.95.75", :netmask => "255.255.255.128"
+    uosnv.vm.network :private_network, :ip => "192.168.95.75", :netmask => "255.255.255.0"
   end
 
   config.vm.define :storage1 do |uosst|
@@ -133,14 +206,33 @@ Vagrant.configure("2") do |config|
     uosst.vm.provider :libvirt do |virthost|
       virthost.memory = 2048
       virthost.cpus = 2
-      virthost.driver = 'kvm'
-      virthost.disk_bus = 'scsi'
-      virthost.storage :file, size: '200G', type: 'qcow2', path: 'disk_storage1.img', bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
+      virthost.driver = "kvm"
+      virthost.disk_bus = "scsi"
+      virthost.storage :file, size: "300G", type: "qcow2", path: "disk_storage1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
+    end
+
+    uosst.vm.provider :vmware_desktop do |virthost|
+      virthost.vmx["memsize"] = "2048"
+      virthost.vmx["numvcpus"] = "2"
+      virthost.vmx["disk.EnableUUID"] = "TRUE"
+      virthost.vmx["ethernet0.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.connectiontype"] = "hostonly"
+      virthost.vmx["ethernet1.nopromisc"] = "TRUE"
+      virthost.vmx["ethernet1.virtualdev"] = "vmxnet3"
+      virthost.vmx["ethernet2.connectionType"] = "custom"
+      virthost.vmx["ethernet2.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet2.noPromisc"] = "TRUE"
+    end
+
+    uosst.vm.provider :parallels do |virthost|
+      virthost.memory = 2048
+      virthost.cpus = 2
+      virthost.customize ["set", :id, "--device-add", "hdd", "--size", "300000", "--iface", "sata"]
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
-    uosst.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.80", netmask: "255.255.255.128", virtualbox__intnet: "os_mgmt"
+    uosst.vm.network :private_network, libvirt__network_name: "os_mgmt", libvirt__dhcp_enabled: false, libvirt__forward_mode: "veryisolated", ip: "192.168.80.80", netmask: "255.255.255.0", virtualbox__intnet: "os_mgmt"
     # Default input ip, used mainly for ansible reachablity
-    uosst.vm.network :private_network, :ip => "192.168.95.80", :netmask => "255.255.255.128"
+    uosst.vm.network :private_network, :ip => "192.168.95.80", :netmask => "255.255.255.0"
   end
 end

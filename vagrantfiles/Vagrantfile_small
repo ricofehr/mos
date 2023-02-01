@@ -17,8 +17,26 @@ Vagrant.configure("2") do |config|
     uosi.vm.provider :libvirt do |virthost|
       virthost.memory = 1024
       virthost.cpus = 1
-      virthost.driver = 'kvm'
-      virthost.disk_bus = 'scsi'
+      virthost.driver = "kvm"
+      virthost.disk_bus = "scsi"
+    end
+
+    uosi.vm.provider :vmware_desktop do |virthost|
+      virthost.vmx["memsize"] = "1024"
+      virthost.vmx["numvcpus"] = "1"
+      virthost.vmx["disk.EnableUUID"] = "TRUE"
+      virthost.vmx["ethernet0.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.connectionType"] = "hostonly"
+      virthost.vmx["ethernet1.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.noPromisc"] = "TRUE"
+      virthost.vmx["ethernet2.connectionType"] = "custom"
+      virthost.vmx["ethernet2.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet2.noPromisc"] = "TRUE"
+    end
+
+    uosi.vm.provider :parallels do |virthost|
+      virthost.memory = 1024
+      virthost.cpus = 1
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
@@ -47,14 +65,36 @@ Vagrant.configure("2") do |config|
       # RAM / CPU
       virthost.memory = 14336
       virthost.cpus = 2
-     end
+    end
 
     uosc.vm.provider :libvirt do |virthost|
       virthost.memory = 14336
       virthost.cpus = 2
-      virthost.driver = 'kvm'
-      virthost.disk_bus = 'scsi'
-      virthost.storage :file, size: '50G', type: 'qcow2', path: 'disk_infra1.img', bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+      virthost.driver = "kvm"
+      virthost.disk_bus = "scsi"
+      virthost.storage :file, size: "50G", type: "qcow2", path: "disk_infra1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+    end
+
+    uosc.vm.provider :vmware_desktop do |virthost|
+      virthost.vmx["memsize"] = "14336"
+      virthost.vmx["numvcpus"] = "2"
+      virthost.vmx["disk.EnableUUID"] = "TRUE"
+      virthost.vmx["ethernet0.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.connectiontype"] = "hostonly"
+      virthost.vmx["ethernet1.noPromisc"] = "FALSE"
+      virthost.vmx["ethernet1.virtualdev"] = "vmxnet3"
+      virthost.vmx["ethernet2.connectionType"] = "hostonly"
+      virthost.vmx["ethernet2.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet2.noPromisc"] = "TRUE"
+      virthost.vmx["ethernet3.connectionType"] = "custom"
+      virthost.vmx["ethernet3.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet3.noPromisc"] = "TRUE"
+    end
+
+    uosc.vm.provider :parallels do |virthost|
+      virthost.memory = 14336
+      virthost.cpus = 2
+      virthost.customize ["set", :id, "--device-add", "hdd", "--size", "50000", "--iface", "sata"]
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
@@ -96,11 +136,43 @@ Vagrant.configure("2") do |config|
       virthost.memory = 14336
       virthost.cpus = 6
       virthost.nested = true
-      virthost.driver = 'kvm'
+      virthost.driver = "kvm"
       virthost.cpu_mode = "host-passthrough"
-      #virthost.cpu_feature :name => 'vmx', :policy => 'require'
-      virthost.disk_bus = 'scsi'
-      virthost.storage :file, size: '200G', type: 'qcow2', path: 'disk_compute1.img', bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+      virthost.disk_bus = "scsi"
+      virthost.storage :file, size: "200G", type: "qcow2", path: "disk_compute1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+    end
+
+    uosnv.vm.provider :vmware_desktop do |virthost|
+      virthost.vmx["memsize"] = "14336"
+      virthost.vmx["numvcpus"] = "6"
+      virthost.vmx["disk.EnableUUID"] = "TRUE"
+      virthost.vmx["vmx.allowNested"] = "TRUE"
+      virthost.vmx["cpuid.enable_vmx"] = "TRUE"
+      virthost.vmx["cpuid.supportsMulticore"] = "TRUE"
+      virthost.vmx["vhv.enable"] = "TRUE"
+      virthost.vmx["virtualHW.version"] = "19"
+      virthost.vmx["monitor_control.enable_paravirt"] = "TRUE"
+      virthost.vmx["monitor_control.disableNMI"] = "FALSE"
+      virthost.vmx["monitor.virtual_mmu"] = "hardware"
+      virthost.vmx["monitor.virtual_exec"] = "hardware"
+      virthost.vmx["numa.nodeAffinity"] = "TRUE"
+      virthost.vmx["ethernet0.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.connectiontype"] = "hostonly"
+      virthost.vmx["ethernet1.noPromisc"] = "TRUE"
+      virthost.vmx["ethernet1.virtualdev"] = "vmxnet3"
+      virthost.vmx["ethernet2.connectionType"] = "hostonly"
+      virthost.vmx["ethernet2.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet2.noPromisc"] = "TRUE"
+      virthost.vmx["ethernet3.connectionType"] = "custom"
+      virthost.vmx["ethernet3.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet3.noPromisc"] = "TRUE"
+    end
+
+    uosnv.vm.provider :parallels do |virthost|
+      virthost.memory = 14336
+      virthost.cpus = 6
+      virthost.customize ["set", :id, "--nested-virt", "on"]
+      virthost.customize ["set", :id, "--device-add", "hdd", "--size", "200000", "--iface", "sata"]
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...
@@ -134,9 +206,28 @@ Vagrant.configure("2") do |config|
     uosst.vm.provider :libvirt do |virthost|
       virthost.memory = 1536
       virthost.cpus = 2
-      virthost.driver = 'kvm'
-      virthost.disk_bus = 'scsi'
-      virthost.storage :file, size: '100G', type: 'qcow2', path: 'disk_storage1.img', bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+      virthost.driver = "kvm"
+      virthost.disk_bus = "scsi"
+      virthost.storage :file, size: "100G", type: "qcow2", path: "disk_storage1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+    end
+
+    uosst.vm.provider :vmware_desktop do |virthost|
+      virthost.vmx["memsize"] = "1536"
+      virthost.vmx["numvcpus"] = "2"
+      virthost.vmx["disk.EnableUUID"] = "TRUE"
+      virthost.vmx["ethernet0.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet1.connectiontype"] = "hostonly"
+      virthost.vmx["ethernet1.nopromisc"] = "TRUE"
+      virthost.vmx["ethernet1.virtualdev"] = "vmxnet3"
+      virthost.vmx["ethernet2.connectionType"] = "custom"
+      virthost.vmx["ethernet2.virtualDev"] = "vmxnet3"
+      virthost.vmx["ethernet2.noPromisc"] = "TRUE"
+    end
+
+    uosst.vm.provider :parallels do |virthost|
+      virthost.memory = 1536
+      virthost.cpus = 2
+      virthost.customize ["set", :id, "--device-add", "hdd", "--size", "100000", "--iface", "sata"]
     end
 
     # Mgmt openstack vlan with multiples id (10 / 20), for internal flux like db, storage, messaging, ...

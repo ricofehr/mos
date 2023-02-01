@@ -82,6 +82,8 @@
   roles:
     - role: k8s_deploy
       tags: [postinstall, k8s_deploy]
+      when: global_k8s_deploy == "1"
     - role: end
       tags: [postinstall]
+      when: global_k8s_deploy == "1"
 

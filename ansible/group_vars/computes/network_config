@@ -34,6 +34,8 @@ network_config_block: |
       bridge_fd 0
       bridge_ports eth1.{{ network_config_eth1_vlan_1 }}
       address {{ network_config_brmgmt_address }}
+      post-up ip link set dev eth1.{{ network_config_eth1_vlan_1 }} mtu 1480
+      post-up ethtool -K eth1.{{ network_config_eth1_vlan_1 }} tso off
 
   auto br-vlan
   iface br-vlan inet manual
@@ -42,6 +44,7 @@ network_config_block: |
       bridge_fd 0
       bridge_ports eth2.{{ network_config_eth2_vlan_2 }}
       post-up ethtool -K eth2 gro off
+      post-up ip link set dev eth2.{{ network_config_eth2_vlan_2 }} mtu 1480
 
   auto br-vxlan
   iface br-vxlan inet static
@@ -50,6 +53,7 @@ network_config_block: |
       bridge_fd 0
       bridge_ports eth2.{{ network_config_eth2_vlan_1 }}
       address {{ network_config_brvxlan_address }}
+      post-up ethtool -K eth2.{{ network_config_eth2_vlan_1 }} tso off
   
   auto br-storage
   iface br-storage inet static
@@ -58,4 +62,6 @@ network_config_block: |
       bridge_fd 0
       bridge_ports eth1.{{ network_config_eth1_vlan_2 }}
       address {{ network_config_brstorage_address }}
+      post-up ip link set dev eth1.{{ network_config_eth1_vlan_2 }} mtu 1480
+      post-up ethtool -K eth1.{{ network_config_eth1_vlan_2 }} tso off
 

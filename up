@@ -65,11 +65,19 @@ if ((ISDESTROY == 1)); then
   vagrant destroy -f || echo "No vms previously installed"
 fi
 
-# Create vdi disk folder
-if [[ "$PROVIDER" = "virtualbox" ]]; then
-  #LIBVIRTDRIVER="qemu"
-  sudo mkdir -p /usr/local/datas/os
-  sudo chmod 777 /usr/local/datas/os
+# nested virt is disabled on Ventura for virtualbox
+if [[ "$PROVIDER" == "virtualbox" ]]; then
+  LIBVIRTDRIVER="qemu"
+fi
+
+# nested virt is not full on current version of Fusion with Ventura
+if [[ "$PROVIDER" == "vmware_desktop" ]]; then
+  LIBVIRTDRIVER="qemu"
+fi
+
+# kvm provider causes kernel panic on current version of Parallels with Ventura
+if [[ "$PROVIDER" == "parallels" ]]; then
+  LIBVIRTDRIVER="qemu"
 fi
 
 # Launch vagrant vms

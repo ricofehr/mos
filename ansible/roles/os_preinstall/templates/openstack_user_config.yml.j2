@@ -19,6 +19,7 @@ global_overrides:
   provider_networks:
     - network:
         container_bridge: "{{ os_preinstall_mgmt_network_bridge }}"
+        container_mtu: "1480"
         container_type: "veth"
         container_interface: "eth1"
         ip_from_q: "{{ os_preinstall_mgmt_network_name }}"
