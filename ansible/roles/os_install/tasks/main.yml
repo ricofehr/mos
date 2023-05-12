@@ -1,38 +1,42 @@
 ---
 
 - name: Logs folder
+  become: yes
   file:
     path: "{{ os_install_logs_folder }}"
     owner: "{{ ansible_user }}"
     state: directory
     mode: 0775
-  become: yes
 
 - name: Execute openstack-ansible setup-hosts
+  become: yes
+  run_once: yes
   shell: |
     openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-hosts.yml >{{ os_install_logs_folder }}/log_osa_hosts_$(date +%s) 2>&1
   args:
+    executable: /bin/bash
     chdir: /opt/openstack-ansible/playbooks
   retries: 2
   delay: 5
   register: result
   until: result.rc == 0
-  run_once: yes
-  become: yes
 
 - name: Execute openstack-ansible setup-infra
+  become: yes
+  run_once: yes
   shell: |
     openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-infrastructure.yml >{{ os_install_logs_folder }}/log_osa_infra_$(date +%s) 2>&1
   args:
+    executable: /bin/bash
     chdir: /opt/openstack-ansible/playbooks
   retries: 2
   delay: 5
   register: result
   until: result.rc == 0
-  run_once: yes
-  become: yes
 
 - name: Execute openstack-ansible setup-openstack
+  become: yes
+  run_once: yes
   shell: |
     openstack-ansible --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5" setup-openstack.yml >{{ os_install_logs_folder }}/log_osa_setup_$(date +%s) 2>&1
   args:
@@ -42,6 +46,4 @@
   delay: 5
   register: result
   until: result.rc == 0
-  run_once: yes
-  become: yes
 

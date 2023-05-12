@@ -1,7 +1,7 @@
 ---
 
 - name: Override openssl.cnf (add altsubjectname line)
+  become: yes
   template:
     src: templates/openssl.cnf.j2
     dest: /etc/ssl/openssl.cnf
-  become: yes

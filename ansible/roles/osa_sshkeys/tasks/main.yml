@@ -1,18 +1,18 @@
 ---
 
 - name: Root .ssh folder
+  become: yes
   file:
     path: ~/.ssh
     owner: root
     state: directory
     mode: 0700
-  become: yes
 
 - name: Prepare ssh authorized key file onto target hosts
+  become: yes
   copy:
     src: .ssh/authorized_keys
     dest: ~/.ssh/authorized_keys
     remote_src: yes
     mode: 0600
-  become: yes
 

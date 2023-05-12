@@ -1,13 +1,14 @@
 ---
 
 - name: Install vlan and bridge management packages
+  become: yes
   apt:
     name: "{{ item }}"
     state: present
   loop: "{{ network_config_pkgs }}"
-  become: yes
 
 - name: Enable bonding and vlan as kernel modules
+  become: yes
   lineinfile:
     path: /etc/modules
     line: "{{ item }}"
@@ -15,20 +16,19 @@
   loop:
     - "bonding"
     - "8021q"
-  become: yes
 
 - name: Configure br-vlan <-> br-lbaas
+  become: yes
+  when: network_config_brlbaas_address is defined
   template:
     src: templates/configure_br-lbaas_veth.sh.j2
     dest: /usr/local/bin/configure_br-lbaas_veth.sh
     mode: 0775
-  when: network_config_brlbaas_address is defined
-  become: yes
 
 - name: Network interface file
+  become: yes
   blockinfile:
     path: /etc/network/interfaces
     block: "{{ network_config_block }}"
   notify: Reboot the current host
-  become: yes
 

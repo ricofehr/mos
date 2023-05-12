@@ -1,8 +1,9 @@
 ---
 
-- sysctl:
+- name: Set some kernel parameters
+  become: yes
+  sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
     sysctl_set: yes
   loop: "{{ sysctl_list }}"
-  become: yes

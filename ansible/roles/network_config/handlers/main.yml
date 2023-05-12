@@ -1,6 +1,6 @@
 ---
 
 - name: Reboot the current host
+  become: yes
   reboot:
     reboot_timeout: 420
-  become: yes
