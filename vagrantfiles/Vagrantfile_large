@@ -11,8 +11,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.define :installer1 do |uosi|
     uosi.vm.hostname = :installer1
-    uosi.vm.box = "generic/ubuntu2004"
-    uosi.vm.box_version = "3.4.2"
+    uosi.vm.box = "generic/ubuntu2204"
+    uosi.vm.box_version = "4.2.16"
     uosi.vm.provider :virtualbox do |virthost|
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
       virthost.customize ["modifyvm", :id, "--nic2", "intnet"]
@@ -56,7 +56,7 @@ Vagrant.configure("2") do |config|
   config.vm.define :infra1 do |uosc|
     uosc.vm.hostname = :infra1
     uosc.vm.box = "generic/ubuntu2004"
-    uosc.vm.box_version = "3.4.2"
+    uosc.vm.box_version = "4.2.16"
     uosc.vm.disk :disk, name: "disk_infra1", size: "150GB"
     uosc.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
@@ -81,7 +81,7 @@ Vagrant.configure("2") do |config|
       virthost.cpus = 4
       virthost.driver = "kvm"
       virthost.disk_bus = "scsi"
-      virthost.storage :file, size: "150G", type: "qcow2", path: "disk_infra1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+      virthost.storage :file, size: "150G", type: "qcow2", path: "disk_infra1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
     end
 
     uosc.vm.provider :vmware_desktop do |virthost|
@@ -118,7 +118,7 @@ Vagrant.configure("2") do |config|
     config.vm.define name do |uosnv|
       uosnv.vm.hostname = name
       uosnv.vm.box = "generic/ubuntu2004"
-      uosnv.vm.box_version = "3.4.2"
+      uosnv.vm.box_version = "4.2.16"
       uosnv.vm.disk :disk, name: "disk_#{name}", size: "300GB"
       uosnv.vm.provider :virtualbox do |virthost|
         # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
@@ -136,7 +136,7 @@ Vagrant.configure("2") do |config|
         virthost.auto_nat_dns_proxy = false
 
         # RAM / CPU
-        virthost.memory = 37376
+        virthost.memory = 40960
         virthost.cpus = 8
 
         # enable nested virtualization
@@ -144,17 +144,17 @@ Vagrant.configure("2") do |config|
       end
 
       uosnv.vm.provider :libvirt do |virthost|
-        virthost.memory = 37376
+        virthost.memory = 40960
         virthost.cpus = 8
         virthost.nested = true
         virthost.driver = "kvm"
         virthost.cpu_mode = "host-passthrough"
         virthost.disk_bus = "scsi"
-        virthost.storage :file, size: "300G", type: "qcow2", path: "disk_#{name}.img", bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+        virthost.storage :file, size: "300G", type: "qcow2", path: "disk_#{name}.img", bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
       end
 
       uosnv.vm.provider :vmware_desktop do |virthost|
-        virthost.vmx["memsize"] = "37376"
+        virthost.vmx["memsize"] = "40960"
         virthost.vmx["numvcpus"] = "8"
         virthost.vmx["disk.EnableUUID"] = "TRUE"
         virthost.vmx["vmx.allowNested"] = "TRUE"
@@ -180,7 +180,7 @@ Vagrant.configure("2") do |config|
       end
 
       uosnv.vm.provider :parallels do |virthost|
-        virthost.memory = 37376
+        virthost.memory = 40960
         virthost.cpus = 8
         virthost.customize ["set", :id, "--nested-virt", "on"]
         virthost.customize ["set", :id, "--device-add", "hdd", "--size", "300000", "--iface", "sata"]
@@ -199,7 +199,7 @@ Vagrant.configure("2") do |config|
   config.vm.define :storage1 do |uosst|
     uosst.vm.hostname = :storage1
     uosst.vm.box = "generic/ubuntu2004"
-    uosst.vm.box_version = "3.4.2"
+    uosst.vm.box_version = "4.2.16"
     uosst.vm.disk :disk, name: "disk_storage1", size: "300GB"
     uosst.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
@@ -221,7 +221,7 @@ Vagrant.configure("2") do |config|
       virthost.cpus = 2
       virthost.driver = "kvm"
       virthost.disk_bus = "scsi"
-      virthost.storage :file, size: "300G", type: "qcow2", path: "disk_storage1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "native", discard: "unmap"
+      virthost.storage :file, size: "300G", type: "qcow2", path: "disk_storage1.img", bus: "scsi", device: "sdb", cache: "writeback", io: "threads", discard: "unmap"
     end
 
     uosst.vm.provider :vmware_desktop do |virthost|
