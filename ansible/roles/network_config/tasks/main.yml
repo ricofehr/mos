@@ -25,6 +25,14 @@
     dest: /usr/local/bin/configure_br-lbaas_veth.sh
     mode: 0775
 
+- name: Add route for openstack external network
+  become: yes
+  when: network_is_openstack_route_needed | bool
+  template:
+    src: templates/openstack-route.j2
+    dest: /etc/network/if-up.d/openstack-route
+    mode: 0775
+
 - name: Network interface file
   become: yes
   blockinfile:

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [[ $IFACE == "eth2" ]]; then
+  route add -net {{ network_config_publicos_subnet }} gw {{ network_config_controller_gw }} dev eth2
+fi

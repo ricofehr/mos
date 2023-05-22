@@ -9,6 +9,8 @@ network_config_pkgs:
   - ntpdate
   - vlan
 
+network_is_openstack_route_needed: no
+
 network_config_block: |
   auto br-vlan
   iface br-vlan inet static

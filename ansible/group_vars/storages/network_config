@@ -26,7 +26,7 @@ network_config_block: |
       bridge_fd 0
       bridge_ports eth1.{{ network_config_eth1_vlan_1 }}
       address {{ network_config_brmgmt_address }}
-      post-up ip link set dev eth1.{{ network_config_eth1_vlan_1 }} mtu 1480
+      post-up ip link set dev eth1.{{ network_config_eth1_vlan_1 }} mtu {{ global_mtu }}
       post-up ethtool -K eth1.{{ network_config_eth1_vlan_1 }} tso off
   
   # Storage bridge
@@ -37,6 +37,6 @@ network_config_block: |
       bridge_fd 0
       bridge_ports eth1.{{ network_config_eth1_vlan_2 }}
       address {{ network_config_brstorage_address }}
-      post-up ip link set dev eth1.{{ network_config_eth1_vlan_2 }} mtu 1480
+      post-up ip link set dev eth1.{{ network_config_eth1_vlan_2 }} mtu {{ global_mtu }}
       post-up ethtool -K eth1.{{ network_config_eth1_vlan_2 }} tso off
 
