@@ -1,0 +1,30 @@
+---
+
+- include_vars: "packages.yml"
+
+- name: check if newer install
+  stat:
+    path: ~/.ansible_base
+  register: new_install
+
+- name: Update all packages to the latest version
+  become: yes
+  when: not new_install.stat.exists
+  apt:
+    upgrade: dist
+
+- name: Install packages
+  become: yes
+  apt:
+    name: "{{ base_packages }}"
+    state: present
+    update_cache: true
+    force: yes
+
+- name: Install packages, always in latest version
+  become: yes
+  apt:
+    name: "{{ base_packages_latest }}"
+    state: latest
+    update_cache: true
+    force: yes
