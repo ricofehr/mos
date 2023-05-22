@@ -1,7 +1,7 @@
 # os-ansible-poc
 
-Openstack (victoria release) installation with Vagrant : 1 controller/neutron, 1 cinder, 1 or 2 nova computes, with use of openstack-ansible project.
-Optionnaly, deploy on openstack a k8s (v1.20) on 3 to 6 vms : 1 master and 2 to 5 nodes.
+Openstack (Zed release) installation with Vagrant : 1 controller/neutron, 1 cinder, 1 or 2 nova computes, with use of openstack-ansible project.
+Optionnaly, deploy on openstack a k8s (v1.27.2) on 3 to 6 vms : 1 master and 2 to 5 nodes.
 
 ## Requirements
 
@@ -49,7 +49,6 @@ Usage: ./up [options]
               - small : host with 32Go ram / 4 cores / 300Go free disk space
               - medium : host with 64Go ram / 6 cores / 600Go free disk space
               - large : host with 96Go ram / 8 cores / 1000Go free disk space
-              - xlarge : host with 128Go ram / 12 cores / 1500Go free disk space
 ```
 
 ## PostInstall Instructions
@@ -71,7 +70,7 @@ https://172.29.36.100/ (tenant0 / tenant0 and admin / toor)
 
 ## K8S Deployment
 
-You can deploy a k8s during setup with '-k' parameter on ./up command (sizing small by default)
+You can deploy a k8s during setup with '-k' parameter on ./up command
 ```
 ./up -k
 ```
@@ -81,12 +80,8 @@ This deployment uses this k8s install repository: https://github.com/ricofehr/k8
 
 Once k8s deployed, get the "loadbalancer k8s" floating ip from openstack dashboard and add this line to your /etc/hosts file
 ```
-LOADBALANCERIP gitea.k8s.local sonar.k8s.local jenkinsx.k8s.local dashboard.k8s.local registry.k8s.local
+LOADBALANCERIP dashboard.k8s.local
 ```
 
-After that you can reach the following urls (other tools in next releases)
+After that you can reach the following urls
 - https://dashboard.k8s.local/ => k8s dashboard
-- https://gitea.k8s.local/ => gitea git repository
-- https://sonar.k8s.local/ => Quality code scan tool
-- https://registry.k8s.local/ => private docker registry
-- https://jenkinsx.k8s.local/ => Jenkinsx CI/CD tool
