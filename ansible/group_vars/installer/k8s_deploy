@@ -14,4 +14,4 @@ k8s_deploy_version: "{{ global_k8s_repo_release }}"
 k8s_deploy_sizing: "{{ global_k8s_deploy_sizing }}"
 k8s_deploy_ubuntu_os_img: "{{ global_k8s_ubuntu_os_img }}"
 k8s_deploy_firstboot_creates_path: "{{ global_all_firstboot_creates_path }}"
-
+k8s_deploy_mirror_registry: "{{ global_k8s_mirror_registry }}"

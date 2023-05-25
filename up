@@ -6,20 +6,22 @@ K8SDEPLOY=0
 ISDESTROY=0
 LIBVIRTDRIVER="kvm"
 SIZING=small
+MIRROR_REGISTRY=""
 
 # Help function
 deployhelp() {
   cat <<EOF
 Usage: $0 [options]
--h           this is some help text.
--d           destroy all previously openstack install
--k           deploy k8s onto 6 vms (1 master and 5 nodes) after openstack install ending
--p xxxx      vagrant provider, default is virtualbox
--s xxxx      sizing deployment, default is small
-              - small : host with 32Go ram / 4 cores / 300Go free disk space
-              - medium : host with 64Go ram / 6 cores / 600Go free disk space
-              - large : host with 96Go ram / 8 cores / 1000Go free disk space
-              - xlarge : host with 128Go ram / 12 cores / 1500Go free disk space
+-h                      this is some help text.
+-d                      destroy all previously openstack install
+-k                      deploy k8s onto 6 vms (1 master and 5 nodes) after openstack install ending
+-p xxxx                 vagrant provider, default is virtualbox
+-s xxxx                 sizing deployment, default is small
+                          - small : host with 32Go ram / 4 cores / 300Go free disk space
+                          - medium : host with 64Go ram / 6 cores / 600Go free disk space
+                          - large : host with 96Go ram / 8 cores / 1000Go free disk space
+                          - xlarge : host with 128Go ram / 12 cores / 1500Go free disk space
+--registry-mirror xx    useful only if -k option is setted, define containers private mirror registry, default is None (use public)
 EOF
 
 exit 1
@@ -44,6 +46,11 @@ while (($# > 0)); do
     -s)
       shift
       SIZING=$1
+      shift
+      ;;
+    --registry-mirror)
+      shift
+      MIRROR_REGISTRY=$1
       shift
       ;;
     -h)
@@ -89,6 +96,9 @@ sleep 10
 export ANSIBLE_NOCOWS=1
 # Disable host key checking
 export ANSIBLE_HOST_KEY_CHECKING=False
+# Define MIRROR_REGISTRY extra value if needed
+MIRROR_REGISTRY_PARAMETER=""
+[[ -z "$MIRROR_REGISTRY" ]] || MIRROR_REGISTRY_PARAMETER="-e global_k8s_mirror_registry=$MIRROR_REGISTRY"
 
 mkdir -p tmp
 
@@ -96,6 +106,6 @@ mkdir -p tmp
 pushd ansible >/dev/null
 ln -sf inventories/inventory_${SIZING} inventory
 ln -sf sizing_vars/sizing_vars_${SIZING}.yml sizing_vars.yml
-ansible-playbook --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "global_os_nova_virt_type=$LIBVIRTDRIVER" --extra-vars "global_k8s_deploy=$K8SDEPLOY" 2>&1 | tee ../tmp/openstack-deploy.log
+ansible-playbook --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "global_os_nova_virt_type=$LIBVIRTDRIVER" --extra-vars "global_k8s_deploy=$K8SDEPLOY" $MIRROR_REGISTRY_PARAMETER 2>&1 | tee ../tmp/openstack-deploy.log
 popd >/dev/null
 

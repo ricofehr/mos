@@ -10,9 +10,10 @@ global_eth2_vlan_2: 40
 global_mtu: 1450
 global_k8s_deploy: 1
 global_k8s_deploy_sizing: "{{ sizing_k8s_deploy_sizing }}"
-global_k8s_repo_release: "v0.7"
+global_k8s_repo_release: "v0.8"
 global_k8s_ubuntu_os_img: "jammy"
 global_k8s_os_secgrp: "k8s"
+global_k8s_mirror_registry: ""
 
 global_os_osa_version: "26.1.1"
 
