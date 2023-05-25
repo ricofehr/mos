@@ -23,15 +23,23 @@
   template:
     src: templates/configure_br-lbaas_veth.sh.j2
     dest: /usr/local/bin/configure_br-lbaas_veth.sh
-    mode: 0775
+    mode: 0755
 
 - name: Add route for openstack external network
   become: yes
   when: network_is_openstack_route_needed | bool
   template:
     src: templates/openstack-route.j2
-    dest: /etc/network/if-up.d/openstack-route
-    mode: 0775
+    dest: /usr/local/bin/openstack-route
+    mode: 0755
+
+- name: Ensure route is added at each reboot
+  become: yes
+  when: network_is_openstack_route_needed | bool
+  ansible.builtin.cron:
+    name: "route for openstack external network"
+    job: "/usr/local/bin/./openstack-route"
+    user: root
 
 - name: Network interface file
   become: yes
