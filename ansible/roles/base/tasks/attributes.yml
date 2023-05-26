@@ -8,7 +8,7 @@
 - name: set timezone to "{{ base_timezone }}"
   become: yes
   when: base_timezone is defined
-  timezone:
+  community.general.timezone:
     name: "{{ base_timezone }}"
 
 - name: Set the hostname
