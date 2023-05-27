@@ -1,4 +1,8 @@
 ---
+
 base_locale: "en_US.UTF-8"
 base_timezone: "Europe/Paris"
 base_layout: "fr"
+base_firstboot_creates_path: "{{ base_state_folder }}/.ansible/first_boot"
+
+...

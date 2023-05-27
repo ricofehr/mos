@@ -1,9 +1,11 @@
 ---
 
 - name: Set some kernel parameters
-  become: yes
-  sysctl:
+  become: true
+  ansible.posix.sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
-    sysctl_set: yes
+    sysctl_set: true
   loop: "{{ sysctl_list }}"
+
+...

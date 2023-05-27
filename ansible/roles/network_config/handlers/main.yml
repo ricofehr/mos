@@ -1,6 +1,8 @@
 ---
 
 - name: Reboot the current host
-  become: yes
-  reboot:
+  become: true
+  ansible.builtin.reboot:
     reboot_timeout: 420
+
+...

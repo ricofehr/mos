@@ -1,2 +1,13 @@
+---
+
+profile: production
+
+exclude_paths:
+  - collections
+
 kinds:
   - playbook: "**/playbook.{yml,yaml}"
+  - tasks: "**/tasks/*.yml"
+  - vars: "**/vars/*.yml"
+
+...

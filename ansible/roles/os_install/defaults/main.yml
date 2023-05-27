@@ -2,3 +2,6 @@
 
 os_install_firstboot_creates_path: "~/.first_try"
 os_install_logs_folder: "{{ ansible_env.HOME }}/logs"
+os_install_ssh_args: "-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5"
+
+...

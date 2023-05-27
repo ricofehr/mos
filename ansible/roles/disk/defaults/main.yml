@@ -5,3 +5,4 @@ disk_type: ext4
 disk_partition: "{{ disk_device }}1"
 disk_mount_path: /mnt
 
+...

@@ -1,15 +1,15 @@
 ---
 
 - name: Install vlan and bridge management packages
-  become: yes
-  apt:
-    name: "{{ item }}"
+  become: true
+  ansible.builtin.apt:
+    name: "{{ item }}"
     state: present
   loop: "{{ network_config_pkgs }}"
 
 - name: Enable bonding and vlan as kernel modules
-  become: yes
-  lineinfile:
+  become: true
+  ansible.builtin.lineinfile:
     path: /etc/modules
     line: "{{ item }}"
     state: present
@@ -18,23 +18,23 @@
     - "8021q"
 
 - name: Configure br-vlan <-> br-lbaas
-  become: yes
+  become: true
   when: network_config_brlbaas_address is defined
-  template:
+  ansible.builtin.template:
     src: templates/configure_br-lbaas_veth.sh.j2
     dest: /usr/local/bin/configure_br-lbaas_veth.sh
-    mode: 0755
+    mode: '0755'
 
 - name: Add route for openstack external network
-  become: yes
+  become: true
   when: network_is_openstack_route_needed | bool
-  template:
+  ansible.builtin.template:
     src: templates/openstack-route.j2
     dest: /usr/local/bin/openstack-route
-    mode: 0755
+    mode: '0755'
 
 - name: Ensure route is added at each reboot
-  become: yes
+  become: true
   when: network_is_openstack_route_needed | bool
   ansible.builtin.cron:
     name: "route for openstack external network"
@@ -42,9 +42,10 @@
     user: root
 
 - name: Network interface file
-  become: yes
-  blockinfile:
+  become: true
+  ansible.builtin.blockinfile:
     path: /etc/network/interfaces
     block: "{{ network_config_block }}"
   notify: Reboot the current host
 
+...

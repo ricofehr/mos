@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
       virthost.vmx["ethernet0.virtualDev"] = "vmxnet3"
       virthost.vmx["ethernet1.connectionType"] = "hostonly"
       virthost.vmx["ethernet1.virtualDev"] = "vmxnet3"
-      virthost.vmx["ethernet1.noPromisc"] = "TRUE"
+      virthost.vmx["ethernet1.noPromisc"] = "FALSE"
       virthost.vmx["ethernet2.connectionType"] = "custom"
       virthost.vmx["ethernet2.virtualDev"] = "vmxnet3"
       virthost.vmx["ethernet2.noPromisc"] = "TRUE"
@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
     uosc.vm.hostname = :infra1
     uosc.vm.box = "generic/ubuntu2004"
     uosc.vm.box_version = "4.2.16"
-    uosc.vm.disk :disk, name: "disk_infra1", size: "50GB"
+    uosc.vm.disk :disk, size: "50GB", name: "disk_infra1"
     uosc.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
@@ -111,7 +111,7 @@ Vagrant.configure("2") do |config|
     uosnv.vm.hostname = :compute1
     uosnv.vm.box = "generic/ubuntu2004"
     uosnv.vm.box_version = "4.2.16"
-    uosnv.vm.disk :disk, name: "disk_compute1", size: "200GB"
+    uosnv.vm.disk :disk, size: "200GB", name: "disk_compute1"
     uosnv.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]
@@ -191,7 +191,7 @@ Vagrant.configure("2") do |config|
     uosst.vm.hostname = :storage1
     uosst.vm.box = "generic/ubuntu2004"
     uosst.vm.box_version = "4.2.16"
-    uosst.vm.disk :disk, name: "disk_storage1", size: "100GB"
+    uosst.vm.disk :disk, size: "100GB", name: "disk_storage1"
     uosst.vm.provider :virtualbox do |virthost|
       # Virtio adapter for all eth interfaces and ensure internal networks for openstack vlans
       virthost.customize ["modifyvm", :id, "--nictype1", "virtio"]

@@ -1,11 +1,15 @@
-- hosts: infras
+---
+
+- name: Set openssl config for infra node
+  hosts: infras
   serial: 1
   strategy: linear
   roles:
     - role: ssl_altname
       tags: [prerequisites, ssl_altname]
 
-- hosts: all 
+- name: Ensure prerequisites for openstack install
+  hosts: all
   strategy: linear
   vars_files:
     - sizing_vars.yml
@@ -23,7 +27,8 @@
     - role: network_config
       tags: [prerequisites, network]
 
-- hosts:
+- name: Prepare additional disk for infra and computes nodes
+  hosts:
     - infras
     - computes
   strategy: linear
@@ -33,7 +38,8 @@
     - role: disk
       tags: [prerequisites, disk]
 
-- hosts:
+- name: Prepare lvm partition for cinder needs
+  hosts:
     - storages
   strategy: linear
   vars_files:
@@ -42,7 +48,8 @@
     - role: lvm
       tags: [prerequisites, lvm]
 
-- hosts:
+- name: Set end state for computes and storages nodes
+  hosts:
     - computes
     - storages
   strategy: linear
@@ -52,7 +59,8 @@
     - role: end
       tags: [prerequisites]
 
-- hosts: installer
+- name: Install openstack
+  hosts: installer
   serial: 1
   strategy: linear
   vars_files:
@@ -63,7 +71,8 @@
     - role: os_install
       tags: [os, os_install]
 
-- hosts: infras
+- name: Make openstack fine-tuning settings via API
+  hosts: infras
   serial: 1
   strategy: linear
   vars_files:
@@ -74,7 +83,8 @@
     - role: end
       tags: [postinstall]
 
-- hosts: installer
+- name: Deploy k8s if option is setted
+  hosts: installer
   serial: 1
   strategy: linear
   vars_files:
@@ -87,3 +97,4 @@
       tags: [postinstall]
       when: global_k8s_deploy == "1"
 
+...

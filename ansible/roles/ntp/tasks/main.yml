@@ -1,10 +1,11 @@
 ---
 
 - name: Configure ntp
-  become: yes
-  template:
+  become: true
+  ansible.builtin.template:
     src: templates/ntp.conf.j2
     dest: /etc/ntp.conf
-    mode: 0644
+    mode: '0644'
   notify: Restart ntpd
 
+...

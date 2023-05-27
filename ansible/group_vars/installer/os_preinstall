@@ -58,3 +58,4 @@ os_preinstall_osa_version: "{{ global_os_osa_version }}"
 os_preinstall_nova_virt_type: "{{ global_os_nova_virt_type }}"
 os_preinstall_nova_cpus_ratio: "{{ global_os_nova_cpus_ratio }}"
 
+...

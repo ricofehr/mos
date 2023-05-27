@@ -1,4 +1,5 @@
 ---
+
 network_config_ip_id: "{{ ansible_host.split('.')[3] }}"
 network_config_eth1_vlan_1: "{{ global_eth1_vlan_1 }}"
 network_config_brmgmt_address: "{{ global_os_mgmt_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
@@ -21,4 +22,4 @@ network_config_block: |
       post-up ip link set dev eth1.{{ network_config_eth1_vlan_1 }} mtu {{ global_mtu }}
       post-up ethtool -K eth1.{{ network_config_eth1_vlan_1 }} tso off
 
-
+...

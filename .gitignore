@@ -4,4 +4,6 @@ playbook.retry
 ansible/env_vars.yml
 ansible/sizing_vars.yml
 ansible/inventory
+ansible/collections/ansible_collections/**
+!ansible/collections/ansible_collections/.gitkeep
 Vagrantfile

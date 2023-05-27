@@ -1,8 +1,8 @@
 ---
 
-- name: create end firstboot flag file
-  shell: |
-    touch {{ end_firstboot_creates_path }}
+- name: Create end firstboot state file
+  ansible.builtin.command: touch {{ end_firstboot_creates_path }}
   args:
-    executable: /bin/bash
     creates: "{{ end_firstboot_creates_path }}"
+
+...

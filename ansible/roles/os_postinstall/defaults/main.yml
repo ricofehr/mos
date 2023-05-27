@@ -1,4 +1,5 @@
 ---
+
 os_postinstall_firstboot_creates_path: ~/.first_try
 
 os_postinstall_project: project
@@ -39,3 +40,4 @@ os_postinstall_images:
 os_postinstall_k8s_deploy: "0"
 os_postinstall_k8s_os_secgrp: k8s
 
+...

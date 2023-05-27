@@ -65,3 +65,4 @@ network_config_block: |
       post-up ip link set dev eth1.{{ network_config_eth1_vlan_2 }} mtu {{ global_mtu }}
       post-up ethtool -K eth1.{{ network_config_eth1_vlan_2 }} tso off
 
+...

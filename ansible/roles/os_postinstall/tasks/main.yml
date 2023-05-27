@@ -1,50 +1,62 @@
 ---
 
 - name: Init utility container name
-  shell: ls /var/lib/lxc/ | grep utility | tr -d "\n"
-  register: utility_container
-  become: yes
+  become: true
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    ls /var/lib/lxc/ | grep utility | tr -d "\n"
+  args:
+    executable: /bin/bash
+  register: os_postinstall_utility_container
+  changed_when: false
 
 - name: Neutron infra
-  shell: >
-    lxc-attach -n {{ utility_container.stdout }} --
-    /bin/bash -c
+  become: true
+  run_once: true
+  ansible.builtin.command: >
+    lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
     "source /root/openrc &&
     openstack project create {{ os_postinstall_project }} &&
     openstack user create --project {{ os_postinstall_project }} --password {{ os_postinstall_password }} {{ os_postinstall_user }} &&
     openstack role add --user {{ os_postinstall_user }} --project {{ os_postinstall_project }} member &&
     openstack role add --user {{ os_postinstall_user }} --project {{ os_postinstall_project }} _member_ &&
     openstack role add --user {{ os_postinstall_user }} --project {{ os_postinstall_project }} load-balancer_member &&
-    openstack network create --share --project {{ os_postinstall_mgmt_project }} --external --provider-network-type flat --provider-physical-network flat {{ os_postinstall_public_name }} &&
+
+    openstack network create --share --project {{ os_postinstall_mgmt_project }} --external --provider-network-type flat
+    --provider-physical-network flat {{ os_postinstall_public_name }} &&
+
     openstack network create --share --project {{ os_postinstall_project }} --provider-network-type vxlan {{ os_postinstall_private_name }} &&
-    openstack subnet create --project {{ os_postinstall_mgmt_project }} --subnet-range {{ os_postinstall_public_subnet }} --no-dhcp --gateway {{ os_postinstall_public_gw }} --network {{ os_postinstall_public_name }} --ip-version 4 --allocation-pool {{ os_postinstall_public_allocation_pool }} {{ os_postinstall_public_subnet }} &&
-    openstack subnet create --project {{ os_postinstall_project }} --subnet-range {{ os_postinstall_private_subnet }} --dhcp --network {{ os_postinstall_private_name }} --ip-version 4 {{ os_postinstall_private_subnet }} &&
+
+    openstack subnet create --project {{ os_postinstall_mgmt_project }} --subnet-range {{ os_postinstall_public_subnet }}
+    --no-dhcp --gateway {{ os_postinstall_public_gw }} --network {{ os_postinstall_public_name }} --ip-version 4
+    --allocation-pool {{ os_postinstall_public_allocation_pool }} {{ os_postinstall_public_subnet }} &&
+
+    openstack subnet create --project {{ os_postinstall_project }} --subnet-range {{ os_postinstall_private_subnet }}
+    --dhcp --network {{ os_postinstall_private_name }} --ip-version 4 {{ os_postinstall_private_subnet }} &&
+
     openstack router create --no-ha --project {{ os_postinstall_project }} {{ os_postinstall_router_name }} &&
     openstack router add subnet {{ os_postinstall_router_name }} {{ os_postinstall_private_subnet }} &&
     openstack router set {{ os_postinstall_router_name }} --external-gateway {{ os_postinstall_public_name }}"
   args:
-    executable: /bin/bash
     creates: "{{ os_postinstall_firstboot_creates_path }}"
-  run_once: yes
-  become: yes
 
 - name: Flavor setting
-  shell: >
-    lxc-attach -n {{ utility_container.stdout }} --
-    /bin/bash -c
+  become: true
+  run_once: true
+  ansible.builtin.command: >
+    lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
     "source /root/openrc &&
     openstack flavor create --ram {{ item.ram }} --disk {{ item.disk }} --vcpus {{ item.cpus }} {{ item.name }}"
   args:
-    executable: /bin/bash
     creates: "{{ os_postinstall_firstboot_creates_path }}"
   loop: "{{ os_postinstall_flavors }}"
-  run_once: yes
-  become: yes
 
 - name: Security group rules setting
-  shell: >
-    lxc-attach -n {{ utility_container.stdout }} --
-    /bin/bash -c
+  become: true
+  run_once: true
+  ansible.builtin.shell: >
+    set -e -o pipefail;
+    lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
     "source /root/openrc &&
     eval \$(openstack project show {{ os_postinstall_project }} -c id -f shell) &&
     idsecurity=\$(openstack security group list -f csv | grep \$id | sed 's;,.*$;;' | tr -d '\"') &&
@@ -55,89 +67,105 @@
   args:
     executable: /bin/bash
     creates: "{{ os_postinstall_firstboot_creates_path }}"
-  run_once: yes
-  become: yes
 
 - name: Quota setting
-  shell: >
-    lxc-attach -n {{ utility_container.stdout }} --
-    /bin/bash -c
+  become: true
+  run_once: true
+  ansible.builtin.command: >
+    lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
     "source /root/openrc &&
-    openstack quota set --class --instances {{ os_postinstall_quotas.instances }} --key-pairs {{ os_postinstall_quotas.keypairs }} --cores {{ os_postinstall_quotas.cores }} --ram {{ os_postinstall_quotas.ram }} --server-groups {{ os_postinstall_quotas.servergroups }} --server-group-members {{ os_postinstall_quotas.servergroups }} --gigabytes {{ os_postinstall_quotas.diskspace }} --volumes {{ os_postinstall_quotas.volumes }} --snapshots {{ os_postinstall_quotas.snapshots }} default &&
-    openstack quota set --ports {{ os_postinstall_quotas.floatingips }} --floating-ips {{ os_postinstall_quotas.floatingips }} {{ os_postinstall_project }} &&
-    openstack quota set --ports {{ os_postinstall_quotas.floatingips }} --floating-ips {{ os_postinstall_quotas.floatingips }} {{ os_postinstall_mgmt_project }}"
+    openstack quota set --class --instances {{ os_postinstall_quotas.instances }} --key-pairs {{ os_postinstall_quotas.keypairs }}
+    --cores {{ os_postinstall_quotas.cores }} --ram {{ os_postinstall_quotas.ram }} --server-groups {{ os_postinstall_quotas.servergroups }}
+    --server-group-members {{ os_postinstall_quotas.servergroups }} --gigabytes {{ os_postinstall_quotas.diskspace }}
+    --volumes {{ os_postinstall_quotas.volumes }} --snapshots {{ os_postinstall_quotas.snapshots }} default &&
+
+    openstack quota set --ports {{ os_postinstall_quotas.floatingips }}
+    --floating-ips {{ os_postinstall_quotas.floatingips }} {{ os_postinstall_project }} &&
+
+    openstack quota set --ports {{ os_postinstall_quotas.floatingips }}
+    --floating-ips {{ os_postinstall_quotas.floatingips }} {{ os_postinstall_mgmt_project }}"
   args:
-    executable: /bin/bash
     creates: "{{ os_postinstall_firstboot_creates_path }}"
-  run_once: yes
-  become: yes
 
 - name: Get images from Linux providers
-  get_url:
+  become: true
+  run_once: true
+  ansible.builtin.get_url:
     url: "{{ item.url }}"
-    dest: /var/lib/lxc/{{ utility_container.stdout }}/rootfs/tmp/osvm-{{ item.name }}.img
-    mode: 0755
+    dest: /var/lib/lxc/{{ os_postinstall_utility_container.stdout }}/rootfs/tmp/osvm-{{ item.name }}.img
+    mode: '0755'
   loop: "{{ os_postinstall_images }}"
-  run_once: yes
-  become: yes
 
 - name: Upload images on Glance
-  shell: >
-    lxc-attach -n {{ utility_container.stdout }} --
-    /bin/bash -c
+  become: true
+  run_once: true
+  ansible.builtin.command: >
+    lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
     "source /root/openrc &&
-    openstack image create --project {{ os_postinstall_project }} --disk-format qcow2 --file /tmp/osvm-{{ item.name }}.img {{ item.name }} && rm -f /tmp/osvm-{{ item.name }}.img"
+    openstack image create --project {{ os_postinstall_project }} --disk-format qcow2 --file /tmp/osvm-{{ item.name }}.img {{ item.name }}
+    && rm -f /tmp/osvm-{{ item.name }}.img"
   args:
-    executable: /bin/bash
     creates: "{{ os_postinstall_firstboot_creates_path }}"
   loop: "{{ os_postinstall_images }}"
-  run_once: yes
-  become: yes
 
 - name: K8S security group
-  shell: >
-    lxc-attach -n {{ utility_container.stdout }} --
-    /bin/bash -c
+  become: true
+  when: os_postinstall_k8s_deploy == "1"
+  run_once: true
+  ansible.builtin.command: >
+    lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
     "source /root/openrc &&
     openstack security group create --project {{ os_postinstall_project }} k8s &&
-    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 22 --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
-    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 80 --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
-    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 443 --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
-    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 8001 --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
-    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 30000:40000 --remote-ip {{ os_postinstall_private_subnet }} {{ os_postinstall_k8s_os_secgrp }} &&
+    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 22
+    --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
+
+    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 80
+    --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
+
+    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 443
+    --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
+
+    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 8001
+    --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
+
+    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --dst-port 30000:40000
+    --remote-ip {{ os_postinstall_private_subnet }} {{ os_postinstall_k8s_os_secgrp }} &&
+
     openstack security group rule create --project {{ os_postinstall_project }} --protocol icmp --remote-ip 0.0.0.0/0 {{ os_postinstall_k8s_os_secgrp }} &&
-    openstack security group rule create --project {{ os_postinstall_project }} --protocol udp --remote-group {{ os_postinstall_k8s_os_secgrp }} {{ os_postinstall_k8s_os_secgrp }} &&
-    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp --remote-group {{ os_postinstall_k8s_os_secgrp }} {{ os_postinstall_k8s_os_secgrp }}"
+
+    openstack security group rule create --project {{ os_postinstall_project }} --protocol udp
+    --remote-group {{ os_postinstall_k8s_os_secgrp }} {{ os_postinstall_k8s_os_secgrp }} &&
+
+    openstack security group rule create --project {{ os_postinstall_project }} --protocol tcp
+    --remote-group {{ os_postinstall_k8s_os_secgrp }} {{ os_postinstall_k8s_os_secgrp }}"
   args:
-    executable: /bin/bash
     creates: "{{ os_postinstall_firstboot_creates_path }}"
-  when: os_postinstall_k8s_deploy == "1"
-  run_once: yes
-  become: yes
 
 - name: Get public network id
-  shell: >
-    lxc-attach -n {{ utility_container.stdout }} --
-    /bin/bash -c
+  become: true
+  when: os_postinstall_k8s_deploy == "1"
+  ansible.builtin.command: >
+    lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
     "source /root/openrc &&
     openstack network show {{ os_postinstall_public_name }} -c id -f value | tr -d '\n'"
-  register: k8s_deploy_os_public_network_id
-  when: os_postinstall_k8s_deploy == "1"
-  become: yes
+  register: os_postinstall_os_public_network_id
+  changed_when: false
 
 - name: Get private subnetwork id
-  shell: >
-    lxc-attach -n {{ utility_container.stdout }} --
-    /bin/bash -c
+  become: true
+  when: os_postinstall_k8s_deploy == "1"
+  ansible.builtin.command: >
+    lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
     "source /root/openrc &&
     openstack subnet show {{ os_postinstall_private_subnet }} -c id -f value | tr -d '\n'"
-  register: k8s_deploy_os_private_network_id
-  when: os_postinstall_k8s_deploy == "1"
-  become: yes
+  register: os_postinstall_os_private_network_id
+  changed_when: false
 
 - name: Get haproxy ssl cert
-  shell: cat /etc/haproxy/ssl/haproxy_infra1-172.29.236.100.pem
-  register: k8s_deploy_haproxy_ssl_crt
+  become: true
   when: os_postinstall_k8s_deploy == "1"
-  become: yes
+  ansible.builtin.slurp:
+    src: /etc/haproxy/ssl/haproxy_infra1-172.29.236.100.pem
+  register: os_postinstall_haproxy_ssl_crt
 
+...

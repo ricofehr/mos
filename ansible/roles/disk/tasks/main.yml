@@ -1,24 +1,26 @@
 ---
 
 - name: Create a new primary partition
-  become: yes
-  parted:
+  become: true
+  community.general.parted:
     device: "{{ disk_device }}"
     number: 1
     state: present
 
 - name: Create an ext4 filesystem
-  become: yes
-  filesystem:
+  become: true
+  community.general.filesystem:
     fstype: "{{ disk_type }}"
     dev: "{{ disk_partition }}"
 
 - name: Mount and bind a volume
-  become: yes
-  mount:
-    path: "{{ disk_mount_path }}" 
+  become: true
+  ansible.posix.mount:
+    path: "{{ disk_mount_path }}"
     src: "{{ disk_partition }}"
     opts: noatime,nobarrier
     state: mounted
+    boot: true
     fstype: "{{ disk_type }}"
 
+...

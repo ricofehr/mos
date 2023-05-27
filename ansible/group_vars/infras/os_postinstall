@@ -22,3 +22,4 @@ os_postinstall_images: "{{ global_os_images }}"
 os_postinstall_k8s_deploy: "{{ global_k8s_deploy }}"
 os_postinstall_k8s_os_secgrp: "{{ global_k8s_os_secgrp }}"
 
+...

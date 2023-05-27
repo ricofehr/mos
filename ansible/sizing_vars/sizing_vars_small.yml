@@ -48,3 +48,5 @@ sizing_os_quotas:
   floatingips: 20
 
 sizing_k8s_deploy_sizing: small
+
+...

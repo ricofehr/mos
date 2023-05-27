@@ -67,7 +67,9 @@ done
 # Ensure valid sizing
 [[ -f vagrantfiles/Vagrantfile_${SIZING} ]] || SIZING=small
 
+
 # Clean older bootstrap
+[[ -e Vagrantfile ]] || ISDESTROY=0
 if ((ISDESTROY == 1)); then
   vagrant destroy -f || echo "No vms previously installed"
 fi
@@ -104,8 +106,10 @@ mkdir -p tmp
 
 # Deploy an openstack installation
 pushd ansible >/dev/null
+mkdir -p collections/ansible_collections
 ln -sf inventories/inventory_${SIZING} inventory
 ln -sf sizing_vars/sizing_vars_${SIZING}.yml sizing_vars.yml
+ansible-galaxy collection install -r requirements.yml -p ./collections/
 ansible-playbook --ssh-extra-args="-C -o ControlMaster=auto -o ControlPersist=60s -o ConnectTimeout=30 -o ConnectionAttempts=5 -o StrictHostKeyChecking=no" -i inventory playbook.yml --extra-vars "global_os_nova_virt_type=$LIBVIRTDRIVER" --extra-vars "global_k8s_deploy=$K8SDEPLOY" $MIRROR_REGISTRY_PARAMETER 2>&1 | tee ../tmp/openstack-deploy.log
 popd >/dev/null
 

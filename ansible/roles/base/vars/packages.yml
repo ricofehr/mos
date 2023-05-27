@@ -23,7 +23,6 @@ base_packages:
     - nmap
     - tcpdump
     - apt-transport-https
-
-base_packages_latest:
     - ca-certificates
 
+...

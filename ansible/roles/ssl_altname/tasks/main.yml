@@ -1,7 +1,10 @@
 ---
 
 - name: Override openssl.cnf (add altsubjectname line)
-  become: yes
-  template:
+  become: true
+  ansible.builtin.template:
     src: templates/openssl.cnf.j2
     dest: /etc/ssl/openssl.cnf
+    mode: '0644'
+
+...

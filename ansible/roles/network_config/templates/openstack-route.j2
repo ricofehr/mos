@@ -1,3 +1,4 @@
 #!/bin/bash
 
-/usr/sbin/route -n | grep "{{ network_config_controller_gw }}" >/dev/null 2>&1 || /usr/sbin/route add -net {{ network_config_publicos_subnet }} gw {{ network_config_controller_gw }} dev eth2
+/usr/sbin/route -n | grep "{{ network_config_controller_gw }}" >/dev/null 2>&1
+(($? == 0)) || /usr/sbin/route add -net {{ network_config_publicos_subnet }} gw {{ network_config_controller_gw }} dev eth2

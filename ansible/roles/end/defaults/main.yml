@@ -1,3 +1,5 @@
 ---
 
 end_firstboot_creates_path: ~/.ansible/.first_boot
+
+...

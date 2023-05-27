@@ -9,7 +9,7 @@ network_config_pkgs:
   - ntpdate
   - vlan
 
-network_is_openstack_route_needed: no
+network_is_openstack_route_needed: false
 
 network_config_block: |
   auto br-vlan
@@ -21,3 +21,4 @@ network_config_block: |
       address 192.168.1.2
       netmask 255.255.255.0
 
+...

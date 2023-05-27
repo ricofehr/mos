@@ -50,7 +50,7 @@ os_preinstall_used_ips:
   - "192.168.12.70,192.168.12.200"
   - "192.168.13.70,192.168.13.200"
   - "192.168.14.70,192.168.14.200"
-  
+
 os_preinstall_external_lb_vip: "192.168.11.100"
 os_preinstall_internal_lb_vip: "192.168.11.101"
 
@@ -59,3 +59,5 @@ os_preinstall_admin_password: toor
 os_preinstall_osa_version: 22.3.2
 os_preinstall_nova_cpus_ratio: 4.0
 os_preinstall_nova_virt_type: kvm
+
+...

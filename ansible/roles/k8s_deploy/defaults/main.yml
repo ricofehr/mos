@@ -15,3 +15,5 @@ k8s_deploy_ubuntu_os_img: focal
 k8s_deploy_firstboot_creates_path: .firstboot
 
 k8s_deploy_mirror_registry: ""
+
+...
