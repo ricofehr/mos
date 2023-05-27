@@ -27,7 +27,7 @@
 - name: Prepare openstack ssl cert
   ansible.builtin.copy:
     content: |
-             {{ k8s_deploy_haproxy_ssl_crt_content }}
+             {{ k8s_deploy_haproxy_ssl_crt_content | b64decode }}
     dest: "{{ k8s_deploy_haproxy_ssl_crt_path }}"
     mode: '0644'
 
