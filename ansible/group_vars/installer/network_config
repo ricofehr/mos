@@ -3,7 +3,7 @@
 network_config_ip_id: "{{ ansible_host.split('.')[3] }}"
 network_config_eth1_vlan_1: "{{ global_eth1_vlan_1 }}"
 network_config_brmgmt_address: "{{ global_os_mgmt_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
-network_config_controller_gw: "{{ hostvars[groups['infras'][0]]['ansible_host'] }}"
+network_config_controller_gw: "{{ hostvars[groups['infras'][0]]['ansible_host'] }}"
 network_config_publicos_subnet: "{{ global_os_public_network }}.0/{{ global_os_public_network_prefix }}"
 network_is_openstack_route_needed: yes
 

@@ -6,8 +6,7 @@ exclude_paths:
   - collections
 
 kinds:
-  - playbook: "**/playbook.{yml,yaml}"
-  - tasks: "**/tasks/*.yml"
-  - vars: "**/vars/*.yml"
+  - playbook: "**/playbook.yml"
+  - vars: "**/{group_,sizing_}vars/**"
 
 ...

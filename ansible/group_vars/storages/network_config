@@ -4,8 +4,8 @@ network_config_ip_id: "{{ ansible_host.split('.')[3] }}"
 network_config_eth1_vlan_1: "{{ global_eth1_vlan_1 }}"
 network_config_eth1_vlan_2: "{{ global_eth1_vlan_2 }}"
 
-network_config_brmgmt_address: "{{ global_os_mgmt_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
-network_config_brstorage_address: "{{ global_os_storage_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
+network_config_brmgmt_address: "{{ global_os_mgmt_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
+network_config_brstorage_address: "{{ global_os_storage_network }}.{{ network_config_ip_id }}/{{ global_os_prefix }}"
 
 network_config_block: |
   # Container/Host management VLAN interface

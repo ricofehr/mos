@@ -39,11 +39,11 @@ global_os_private_network_prefix: 24
 global_os_private_subnet: "{{ global_os_private_network }}.0/{{ global_os_private_network_prefix }}"
 global_os_private_subnet_range: "{{ global_os_private_network }}.100,{{ global_os_private_network }}.200"
 
-global_infra_nodes: "{{ sizing_infra_nodes}}"
+global_infra_nodes: "{{ sizing_infra_nodes }}"
 global_compute_nodes: "{{ sizing_compute_nodes }}"
 global_storage_nodes: "{{ sizing_storage_nodes }}"
 global_os_nova_cpus_ratio: "{{ sizing_os_nova_cpus_ratio }}"
-global_os_flavors: "{{ sizing_os_flavors }}"
+global_os_flavors: "{{ sizing_os_flavors }}"
 global_os_quotas: "{{ sizing_os_quotas }}"
 
 global_os_images:

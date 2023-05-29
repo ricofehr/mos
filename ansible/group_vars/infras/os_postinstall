@@ -11,7 +11,7 @@ os_postinstall_router_name: "{{ global_os_router_name }}"
 os_postinstall_public_name: "{{ global_os_public_network_name }}"
 os_postinstall_public_subnet: "{{ global_os_public_subnet }}"
 os_postinstall_public_gw: "{{ global_os_public_gw }}"
-os_postinstall_public_allocation_pool: "{{ global_os_public_allocation_pool }}"
+os_postinstall_public_allocation_pool: "{{ global_os_public_allocation_pool }}"
 os_postinstall_private_name: "{{ global_os_private_network_name }}"
 os_postinstall_private_subnet: "{{ global_os_private_subnet }}"
 
