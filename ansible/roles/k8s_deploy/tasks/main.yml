@@ -68,9 +68,10 @@
   ansible.builtin.copy:
     content: >
       ./deploy-to-openstack -o {{ k8s_deploy_ubuntu_os_img }} -s {{ k8s_deploy_sizing }}
-      -snet {{ k8s_deploy_os_private_network_id }} -fip {{ k8s_deploy_os_public_network_id }}
+      -net {{ k8s_deploy_os_private_network_id }} -snet {{ k8s_deploy_os_private_subnetwork_id }}
+      -vip1 {{ k8s_deploy_managers_vip }} -fip {{ k8s_deploy_os_public_network_id }}
       -oscrt {{ k8s_deploy_haproxy_ssl_crt_path }} {{ k8s_deploy_mirror_registry }}
-      -w ~/.local/bin/ansible-playbook
+      {{ k8s_deploy_mirror_registry }} -w ~/.local/bin/ansible-playbook
     dest: "{{ ansible_env.HOME }}/deploy_k8s_cmd"
     mode: '0600'
 
@@ -78,7 +79,8 @@
   when: k8s_deploy == "1"
   ansible.builtin.command: |
     ./deploy-to-openstack -o {{ k8s_deploy_ubuntu_os_img }} -s {{ k8s_deploy_sizing }} \
-    -snet {{ k8s_deploy_os_private_network_id }} -fip {{ k8s_deploy_os_public_network_id }} \
+    -net {{ k8s_deploy_os_private_network_id }} -snet {{ k8s_deploy_os_private_subnetwork_id }} \
+    -vip1 {{ k8s_deploy_managers_vip }} -fip {{ k8s_deploy_os_public_network_id }} \
     -oscrt {{ k8s_deploy_haproxy_ssl_crt_path }} {{ k8s_deploy_mirror_registry }} \
     -w ~/.local/bin/ansible-playbook
   args:

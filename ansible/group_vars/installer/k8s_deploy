@@ -8,7 +8,9 @@ k8s_deploy_haproxy_ssl_crt_folder: "{{ ansible_env.HOME }}/os_crt"
 k8s_deploy_haproxy_ssl_crt_path: "{{ k8s_deploy_haproxy_ssl_crt_folder }}/cloud.crt"
 
 k8s_deploy_os_private_network_id: "{{ hostvars[groups['infras'][0]]['os_postinstall_os_private_network_id'].stdout }}"
+k8s_deploy_os_private_subnetwork_id: "{{ hostvars[groups['infras'][0]]['os_postinstall_os_private_subnetwork_id'].stdout }}"
 k8s_deploy_os_public_network_id: "{{ hostvars[groups['infras'][0]]['os_postinstall_os_public_network_id'].stdout }}"
+k8s_deploy_managers_vip: "{{ global_os_private_network }}.250"
 
 k8s_deploy_version: "{{ global_k8s_repo_release }}"
 k8s_deploy_sizing: "{{ global_k8s_deploy_sizing }}"

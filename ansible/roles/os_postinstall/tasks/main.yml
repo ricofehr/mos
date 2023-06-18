@@ -151,6 +151,16 @@
   register: os_postinstall_os_public_network_id
   changed_when: false
 
+- name: Get private network id
+  become: true
+  when: os_postinstall_k8s_deploy == "1"
+  ansible.builtin.command: >
+    lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
+    "source /root/openrc &&
+    openstack network show {{ os_postinstall_private_name }} -c id -f value | tr -d '\n'"
+  register: os_postinstall_os_private_network_id
+  changed_when: false
+
 - name: Get private subnetwork id
   become: true
   when: os_postinstall_k8s_deploy == "1"
@@ -158,7 +168,7 @@
     lxc-attach -n {{ os_postinstall_utility_container.stdout }} -- /bin/bash -c
     "source /root/openrc &&
     openstack subnet show {{ os_postinstall_private_subnet }} -c id -f value | tr -d '\n'"
-  register: os_postinstall_os_private_network_id
+  register: os_postinstall_os_private_subnetwork_id
   changed_when: false
 
 - name: Get haproxy ssl cert

@@ -1,6 +1,6 @@
 ---
 
-k8s_deploy_repo_url: "https://github.com/ricofehr/k8s"
+k8s_deploy_repo_url: "https://github.com/ricofehr/yakir"
 k8s_deploy_tf_download_url: "https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip"
 k8s_deploy_ansible_version: 7.5.0
 
