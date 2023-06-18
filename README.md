@@ -1,7 +1,7 @@
 # os-ansible-poc
 
 Openstack (Zed release) installation with Vagrant : 1 controller/neutron, 1 cinder, 1 or 2 nova computes, with use of openstack-ansible project.
-Optionnaly, deploy on openstack a k8s (v1.27.2) on 3 to 6 vms : 1 master and 2 to 5 nodes.
+Optionnaly, deploy on openstack a k8s (v1.27.2) on 3 to 6 vms : 1 or 3 manager(s) and 1 to 5 worker node(s).
 
 ## Requirements
 
@@ -76,7 +76,7 @@ You can deploy a k8s during setup with '-k' parameter on ./up command
 ```
 Kubernetes deployment will launch multiple vms : 1 master and 2 (small) to 5 (large) nodes, and use vagrant public ssh key as openstack keypair (!! not secure).
 
-This deployment uses this k8s install repository: https://github.com/ricofehr/k8s
+This deployment uses this k8s install repository: https://github.com/ricofehr/yakir
 
 Once k8s deployed, get the "loadbalancer k8s" floating ip from openstack dashboard and add this line to your /etc/hosts file
 ```
